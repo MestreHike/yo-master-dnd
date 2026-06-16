@@ -1,0 +1,2623 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>YoMaster.dnd — Escudo do Mestre</title>
+  <style>
+    :root {
+      --bg:#0e0b07;--bg2:#171209;--bg3:#1f1810;--bg4:#251d12;
+      --gold:#c9963a;--gold2:#e8b86d;--gold3:#f5d499;
+      --red:#9b2335;--red2:#c73b52;
+      --blue:#2a4a7f;--blue2:#3d6eb5;
+      --green:#2d6b4a;--green2:#4a9b6f;
+      --purple:#5b2d7a;--purple2:#8a4db5;
+      --text:#f0e6cc;--text2:#c8b89a;--muted:#7a6a52;
+      --border:#3a2e1e;--border2:#4a3c28;--shadow:rgba(0,0,0,.8);
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{background:var(--bg);color:var(--text);font-family:Georgia,serif;font-size:15px;line-height:1.5;min-height:100vh}
+
+    /* HEADER */
+    header{background:linear-gradient(180deg,#1a0e04,#0e0b07);border-bottom:2px solid var(--gold);padding:1rem 2rem;text-align:center;position:relative;overflow:hidden}
+    header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(201,150,58,.15),transparent 70%);pointer-events:none}
+    .hdr-sub{font-size:.65rem;color:var(--gold);letter-spacing:.4em;text-transform:uppercase;opacity:.7;margin-bottom:.3rem}
+    header h1{font-family:'Georgia',serif;font-size:clamp(1.8rem,5vw,3rem);font-weight:700;color:var(--gold2);text-shadow:0 0 40px rgba(201,150,58,.5);letter-spacing:.06em}
+    header h1 span{color:var(--gold3)}
+    .hdr-tagline{font-style:italic;color:var(--text2);font-size:.9rem;margin-top:.2rem;opacity:.8}
+    .hdr-rule{margin:.7rem auto 0;width:50%;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+
+    /* TAB NAV */
+    .tab-nav{background:var(--bg2);border-bottom:2px solid var(--border);padding:0 1rem;display:flex;gap:0;position:sticky;top:0;z-index:200;overflow-x:auto}
+    .tab-btn{background:none;border:none;border-bottom:3px solid transparent;color:var(--muted);padding:.75rem 1.3rem;font-family:Georgia,serif;font-size:.85rem;letter-spacing:.05em;cursor:pointer;white-space:nowrap;transition:all .2s;margin-bottom:-2px}
+    .tab-btn:hover{color:var(--text2);border-bottom-color:var(--border2)}
+    .tab-btn.active{color:var(--gold2);border-bottom-color:var(--gold)}
+
+    /* REF SUBNAV */
+    .ref-nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:.5rem 1rem;display:flex;flex-wrap:wrap;gap:.35rem;justify-content:center}
+    .ref-nav a{font-size:.72rem;color:var(--text2);text-decoration:none;padding:.3rem .75rem;border:1px solid var(--border2);border-radius:4px;background:var(--bg3);transition:all .2s}
+    .ref-nav a:hover{color:var(--gold2);border-color:var(--gold);background:var(--bg4)}
+
+    /* TAB CONTENT */
+    .tab-content{display:none}
+    .tab-content.active{display:block}
+
+    /* REFERENCE SCREEN GRID */
+    .screen{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(340px,100%),1fr));gap:1.2rem;padding:1.5rem;max-width:1800px;margin:0 auto}
+    .panel{background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;box-shadow:0 4px 20px var(--shadow)}
+    .panel.wide{grid-column:span 2}
+    @media(max-width:780px){.panel.wide{grid-column:span 1}}
+    .panel-header{padding:.6rem 1rem;font-family:Georgia,serif;font-size:.78rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;display:flex;align-items:center;gap:.5rem;border-bottom:1px solid var(--border)}
+    .panel-header.red{background:linear-gradient(135deg,#3a0d14,#1f0a0d);color:#f5a0b0;border-bottom-color:#6b1525}
+    .panel-header.gold{background:linear-gradient(135deg,#3a2808,#1f1508);color:var(--gold3);border-bottom-color:#6b4a10}
+    .panel-header.blue{background:linear-gradient(135deg,#0a1a3a,#06101f);color:#a0c0f5;border-bottom-color:#153075}
+    .panel-header.green{background:linear-gradient(135deg,#0a2a18,#061508);color:#a0f0c0;border-bottom-color:#154a30}
+    .panel-header.purple{background:linear-gradient(135deg,#1e0a3a,#10051f);color:#d0a0f5;border-bottom-color:#4a1580}
+    .panel-header.dark{background:linear-gradient(135deg,#1a1208,#0e0b05);color:var(--text2);border-bottom-color:var(--border2)}
+    .panel-body{padding:.8rem 1rem}
+    table{width:100%;border-collapse:collapse;font-size:.88rem}
+    th{font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:.35rem .5rem;border-bottom:1px solid var(--border);text-align:left}
+    td{padding:.3rem .5rem;border-bottom:1px solid rgba(58,46,30,.5);vertical-align:top;color:var(--text2)}
+    tr:last-child td{border-bottom:none}
+    tr:hover td{background:rgba(201,150,58,.04);color:var(--text)}
+    td:first-child{color:var(--text);font-weight:600}
+    .divider{grid-column:1/-1;display:flex;align-items:center;gap:1rem;padding:.5rem 0}
+    .divider-line{flex:1;height:1px;background:var(--border)}
+    .divider-title{font-size:.78rem;font-weight:700;color:var(--muted);letter-spacing:.15em;text-transform:uppercase}
+    .formula-box{background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:.7rem 1rem;text-align:center;margin-bottom:.5rem}
+    .formula-label{font-size:.65rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.25rem}
+    .formula{font-size:1rem;color:var(--gold2);letter-spacing:.04em}
+    .formula span{color:var(--text2)}
+    .conditions-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.6rem}
+    .condition{background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:.6rem .8rem;border-left:3px solid var(--red)}
+    .condition.blue-acc{border-left-color:var(--blue2)}
+    .condition.purple-acc{border-left-color:var(--purple2)}
+    .condition.green-acc{border-left-color:var(--green2)}
+    .condition.gold-acc{border-left-color:var(--gold)}
+    .condition-name{font-size:.78rem;font-weight:700;color:var(--gold2);letter-spacing:.05em;margin-bottom:.2rem}
+    .condition p{font-size:.78rem;color:var(--text2);line-height:1.4}
+    .condition p::before{content:'• ';color:var(--muted)}
+    .ex-bar{display:flex;border-radius:4px;overflow:hidden;border:1px solid var(--border);margin-top:.5rem}
+    .ex-level{flex:1;text-align:center;padding:.4rem .2rem;font-size:.68rem;font-weight:700;background:var(--bg3);border-right:1px solid var(--border)}
+    .ex-level:last-child{border-right:none}
+    .ex-level:nth-child(1){color:#f0e6cc}.ex-level:nth-child(2){color:#e0c066}.ex-level:nth-child(3){color:#d08040}.ex-level:nth-child(4){color:#c04040}.ex-level:nth-child(5){color:#a02020}.ex-level:nth-child(6){color:#ff3030;background:#200005}
+    .ex-level .n{font-size:.95rem;display:block}.ex-level .l{font-size:.55rem;opacity:.8}
+    .dc-item{display:flex;align-items:center;gap:.7rem;padding:.28rem .5rem;border-radius:4px;background:var(--bg3);border:1px solid var(--border);margin-bottom:.3rem}
+    .dc-num{font-weight:700;font-size:1.05rem;min-width:1.8rem;text-align:right}
+    .dc-label{font-size:.83rem;color:var(--text2);flex:1}
+    .dc-ex{font-size:.73rem;color:var(--muted);font-style:italic}
+    .dc-item:nth-child(1) .dc-num{color:#8aee8a}.dc-item:nth-child(2) .dc-num{color:#a0d4a0}.dc-item:nth-child(3) .dc-num{color:var(--gold2)}.dc-item:nth-child(4) .dc-num{color:#e07040}.dc-item:nth-child(5) .dc-num{color:#c04040}.dc-item:nth-child(6) .dc-num{color:#ff3030}
+    .skills-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.5rem}
+    .skill-attr{font-size:.68rem;font-weight:700;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.3rem;padding-bottom:.2rem;border-bottom:1px solid var(--border)}
+    .skill-item{font-size:.82rem;color:var(--text2);padding:.12rem 0;display:flex;gap:.35rem}
+    .skill-item::before{content:'◆';color:var(--gold);font-size:.5rem;margin-top:.25rem;flex-shrink:0}
+    .action-item{background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:.45rem .7rem;border-left:3px solid var(--gold);margin-bottom:.4rem}
+    .action-item.bonus{border-left-color:var(--blue2)}.action-item.reaction{border-left-color:var(--purple2)}
+    .action-name{font-size:.78rem;font-weight:700;color:var(--text);letter-spacing:.04em}
+    .action-desc{font-size:.78rem;color:var(--text2);margin-top:.1rem;line-height:1.3}
+    .travel-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem;text-align:center}
+    .travel-card{background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:.7rem .5rem}
+    .travel-name{font-size:.72rem;font-weight:700;letter-spacing:.06em;color:var(--text);margin:.2rem 0}
+    .travel-speed{font-size:1.05rem;font-weight:700;color:var(--gold2)}
+    .travel-day{font-size:.73rem;color:var(--text2)}
+    .travel-effect{font-size:.7rem;color:var(--muted);margin-top:.3rem;font-style:italic}
+    .cover-item{display:flex;align-items:flex-start;gap:.8rem;padding:.4rem .6rem;background:var(--bg3);border:1px solid var(--border);border-radius:4px;margin-bottom:.35rem}
+    .cover-bonus{font-weight:700;font-size:1rem;color:var(--gold2);min-width:2.5rem}
+    .cover-desc{font-size:.8rem;color:var(--text2);line-height:1.4}
+    .light-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem}
+    .light-card{background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:.6rem;text-align:center}
+    .light-icon{font-size:1.4rem;margin-bottom:.2rem}
+    .light-name{font-size:.72rem;font-weight:700;color:var(--text);margin-bottom:.2rem}
+    .light-desc{font-size:.73rem;color:var(--text2);line-height:1.3}
+    .magic-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:.4rem}
+    .magic-school{background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:.45rem .7rem;border-left:3px solid var(--purple2)}
+    .magic-name{font-size:.75rem;font-weight:700;color:var(--purple2);margin-bottom:.1rem}
+    .magic-desc{font-size:.73rem;color:var(--text2);line-height:1.3}
+    .death-grid{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
+    .death-card{background:var(--bg3);border:1px solid var(--border);border-radius:5px;padding:.6rem .8rem;text-align:center}
+    .death-card.ok{border-top:3px solid var(--green2)}.death-card.fail{border-top:3px solid var(--red2)}
+    .death-title{font-size:.72rem;font-weight:700;letter-spacing:.06em;margin-bottom:.4rem}
+    .death-card.ok .death-title{color:var(--green2)}.death-card.fail .death-title{color:var(--red2)}
+    .death-circles{display:flex;gap:.4rem;justify-content:center}
+    .death-circle{width:22px;height:22px;border-radius:50%;border:2px solid var(--border2);background:var(--bg)}
+    .death-text{font-size:.73rem;color:var(--text2);margin-top:.4rem;line-height:1.3}
+    .npc-cols{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem}
+    .npc-col-title{font-size:.68rem;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:.35rem;padding-bottom:.2rem;border-bottom:1px solid var(--border)}
+    .npc-item{font-size:.78rem;color:var(--text2);padding:.13rem 0}
+    .npc-item::before{content:'▸ ';color:var(--gold)}
+    .dmg-tag{background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:.22rem .65rem;font-size:.77rem;display:inline-block;margin:.15rem}
+    .dmg-tag.p{border-color:#6a4a30;color:#c8a070}.dmg-tag.e{border-color:#305080;color:#80b0f0}.dmg-tag.m{border-color:#503080;color:#c080f0}.dmg-tag.r{border-color:#806030;color:#f0d070}.dmg-tag.n{border-color:#303050;color:#8080c0}
+    .enc-badge{display:inline-flex;align-items:center;gap:.3rem;background:var(--bg4);border:1px solid var(--border2);border-radius:4px;padding:.18rem .45rem;font-size:.73rem;color:var(--text2);margin:.1rem}
+    .enc-badge strong{color:var(--gold2)}
+
+    /* ══ COMBAT TRACKER ══ */
+    #tab-combate{padding:1.2rem}
+    .tracker-wrap{max-width:900px;margin:0 auto}
+    .tracker-header{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:1rem;padding:1rem 1.2rem;background:var(--bg2);border:1px solid var(--border);border-radius:8px}
+    .round-display{font-size:1.1rem;font-weight:700;color:var(--gold2)}
+    .round-display span{color:var(--text2);font-size:.85rem;font-weight:400}
+    .tracker-btns{display:flex;gap:.5rem;flex-wrap:wrap;margin-left:auto}
+    .tbtn{padding:.45rem .9rem;border:1px solid var(--border2);border-radius:5px;background:var(--bg3);color:var(--text2);font-size:.82rem;cursor:pointer;transition:all .18s;font-family:Georgia,serif}
+    .tbtn:hover{border-color:var(--gold);color:var(--gold2);background:var(--bg4)}
+    .tbtn.primary{background:var(--gold);color:#0d0b05;border-color:var(--gold);font-weight:700}
+    .tbtn.primary:hover{background:var(--gold2)}
+    .tbtn.danger{border-color:var(--red);color:var(--red2)}
+    .tbtn.danger:hover{background:rgba(155,35,53,.15)}
+
+    /* Add form */
+    .add-form{background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:1rem 1.2rem;margin-bottom:1rem;display:none}
+    .add-form.open{display:block}
+    .add-form h3{font-size:.8rem;color:var(--gold2);letter-spacing:.08em;text-transform:uppercase;margin-bottom:.8rem}
+    .form-row{display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end}
+    .form-group{display:flex;flex-direction:column;gap:.2rem}
+    .form-group label{font-size:.7rem;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+    .form-input{background:var(--bg3);border:1px solid var(--border2);border-radius:4px;color:var(--text);padding:.4rem .6rem;font-size:.88rem;font-family:Georgia,serif;min-width:0}
+    .form-input:focus{outline:none;border-color:var(--gold)}
+    .form-input.wide{min-width:150px}
+    .form-input.num{width:70px;text-align:center}
+    select.form-input{cursor:pointer}
+
+    /* Combatant list */
+    .combatant-list{display:flex;flex-direction:column;gap:.5rem}
+    .combatant{background:var(--bg2);border:1px solid var(--border);border-radius:7px;display:flex;align-items:center;gap:.8rem;padding:.6rem 1rem;transition:border-color .2s,box-shadow .2s;position:relative;overflow:hidden}
+    .combatant::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:transparent;transition:background .2s}
+    .combatant.current::before{background:var(--gold)}
+    .combatant.current{border-color:var(--gold);box-shadow:0 0 20px rgba(201,150,58,.15)}
+    .combatant.dead{opacity:.45;filter:grayscale(.6)}
+    .comb-init{width:44px;height:44px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:700;color:#fff;flex-shrink:0}
+    .comb-init.player{background:linear-gradient(135deg,#1a3a6a,#0d1f3a);border:1px solid var(--blue2)}
+    .comb-init.monster{background:linear-gradient(135deg,#3a0d14,#1f0709);border:1px solid var(--red2)}
+    .comb-init.npc{background:linear-gradient(135deg,#1a2a10,#0d1508);border:1px solid var(--green2)}
+    .comb-info{flex:1;min-width:0}
+    .comb-name{font-size:.95rem;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .comb-name.current{color:var(--gold2)}
+    .comb-conds{display:flex;flex-wrap:wrap;gap:.25rem;margin-top:.2rem}
+    .cond-badge{background:rgba(155,35,53,.25);border:1px solid var(--red2);border-radius:10px;padding:.1rem .45rem;font-size:.68rem;color:var(--red2);cursor:pointer;transition:all .15s}
+    .cond-badge:hover{background:rgba(155,35,53,.45)}
+    .cond-badge.blue{background:rgba(42,74,127,.25);border-color:var(--blue2);color:#a0c0f5}
+    .cond-badge.green{background:rgba(45,107,74,.25);border-color:var(--green2);color:#a0f0c0}
+    .comb-hp-area{display:flex;flex-direction:column;align-items:flex-end;gap:.3rem;flex-shrink:0}
+    .hp-row{display:flex;align-items:center;gap:.3rem}
+    .hp-btn{width:24px;height:24px;border:1px solid var(--border2);border-radius:4px;background:var(--bg3);color:var(--text2);font-size:1rem;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
+    .hp-btn:hover{border-color:var(--gold);color:var(--gold2)}
+    .hp-display{font-size:.88rem;font-weight:700;color:var(--text);min-width:60px;text-align:center;cursor:pointer;padding:.1rem .3rem;border-radius:3px;border:1px solid transparent;transition:border-color .15s}
+    .hp-display:hover{border-color:var(--border2)}
+    .hp-display input{width:100%;background:var(--bg4);border:none;color:var(--gold2);font-size:.88rem;font-weight:700;text-align:center;outline:none;font-family:Georgia,serif}
+    .hp-bar-wrap{width:80px;height:5px;background:var(--bg4);border-radius:3px;overflow:hidden}
+    .hp-bar{height:100%;border-radius:3px;transition:width .3s,background .3s}
+    .ac-badge{font-size:.75rem;color:var(--text2)}
+    .comb-side-btns{display:flex;flex-direction:column;gap:.3rem;flex-shrink:0}
+    .side-btn{width:28px;height:28px;border:1px solid var(--border2);border-radius:4px;background:var(--bg3);color:var(--muted);font-size:.8rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+    .side-btn:hover{border-color:var(--gold);color:var(--gold2)}
+    .side-btn.del:hover{border-color:var(--red2);color:var(--red2)}
+    .tracker-empty{text-align:center;padding:3rem;color:var(--muted);font-style:italic;background:var(--bg2);border:1px dashed var(--border);border-radius:8px}
+
+    /* Condition picker modal */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;display:none;align-items:center;justify-content:center}
+    .modal-overlay.open{display:flex}
+    .modal{background:var(--bg2);border:1px solid var(--border2);border-radius:10px;padding:1.2rem;min-width:320px;max-width:480px;width:90vw}
+    .modal h3{font-size:.85rem;color:var(--gold2);letter-spacing:.08em;text-transform:uppercase;margin-bottom:.8rem}
+    .cond-grid{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.8rem}
+    .cond-pick{padding:.3rem .65rem;border:1px solid var(--border2);border-radius:12px;font-size:.78rem;cursor:pointer;background:var(--bg3);color:var(--text2);transition:all .15s}
+    .cond-pick:hover{border-color:var(--gold);color:var(--gold2)}
+    .cond-pick.selected{background:rgba(155,35,53,.3);border-color:var(--red2);color:var(--red2)}
+    .modal-close{margin-top:.5rem;width:100%}
+
+    /* From chars quick-add */
+    .quick-chars{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.5rem}
+    .quick-char-btn{padding:.3rem .75rem;border:1px solid var(--border2);border-radius:5px;background:var(--bg3);color:var(--text2);font-size:.78rem;cursor:pointer;transition:all .15s}
+    .quick-char-btn:hover{border-color:var(--gold);color:var(--gold2)}
+
+    /* ══ FICHAS TAB ══ */
+    #tab-fichas{padding:1.2rem}
+    .fichas-layout{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;max-width:1400px;margin:0 auto}
+    @media(max-width:900px){.fichas-layout{grid-template-columns:1fr}}
+    .fichas-panel{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+    .fichas-panel-header{padding:.7rem 1rem;font-size:.8rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+    .fichas-panel-header.gold{background:linear-gradient(135deg,#3a2808,#1f1508);color:var(--gold3)}
+    .fichas-panel-header.purple{background:linear-gradient(135deg,#1e0a3a,#10051f);color:#d0a0f5}
+    .fichas-panel-header.green{background:linear-gradient(135deg,#0a2a18,#061508);color:#a0f0c0}
+    .fichas-panel-body{padding:1rem}
+
+    /* Char cards */
+    .char-cards{display:flex;flex-direction:column;gap:.7rem}
+    .char-card{background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:.8rem 1rem;transition:border-color .18s}
+    .char-card:hover{border-color:var(--border2)}
+    .char-card-top{display:flex;align-items:flex-start;gap:.8rem}
+    .char-avatar{width:42px;height:42px;border-radius:8px;background:linear-gradient(135deg,var(--bg4),var(--bg2));border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
+    .char-card-info{flex:1;min-width:0}
+    .char-card-name{font-size:1rem;font-weight:700;color:var(--text)}
+    .char-card-sub{font-size:.78rem;color:var(--text2)}
+    .char-card-stats{display:flex;gap:.8rem;margin-top:.5rem;flex-wrap:wrap}
+    .char-stat{font-size:.78rem;color:var(--text2);display:flex;align-items:center;gap:.3rem}
+    .char-stat strong{color:var(--gold2)}
+    .char-card-actions{display:flex;gap:.4rem;margin-top:.7rem;padding-top:.6rem;border-top:1px solid var(--border)}
+    .caction{padding:.3rem .65rem;border:1px solid var(--border2);border-radius:4px;background:var(--bg4);color:var(--text2);font-size:.75rem;cursor:pointer;transition:all .15s}
+    .caction:hover{border-color:var(--gold);color:var(--gold2)}
+    .caction.del:hover{border-color:var(--red2);color:var(--red2)}
+    .no-chars{text-align:center;padding:2rem;color:var(--muted);font-style:italic}
+
+    /* Upload & AI area */
+    .upload-area{border:2px dashed var(--border2);border-radius:8px;padding:1.5rem;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:1rem}
+    .upload-area:hover,.upload-area.drag{border-color:var(--gold);background:rgba(201,150,58,.05)}
+    .upload-icon{font-size:2rem;margin-bottom:.5rem}
+    .upload-text{font-size:.85rem;color:var(--text2);margin-bottom:.3rem}
+    .upload-sub{font-size:.75rem;color:var(--muted)}
+    .file-hidden{display:none}
+    .or-divider{display:flex;align-items:center;gap:.8rem;color:var(--muted);font-size:.78rem;margin:.8rem 0}
+    .or-divider::before,.or-divider::after{content:'';flex:1;height:1px;background:var(--border)}
+    .ai-textarea{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;color:var(--text);padding:.7rem;font-size:.85rem;font-family:Georgia,serif;resize:vertical;min-height:100px;line-height:1.5}
+    .ai-textarea:focus{outline:none;border-color:var(--gold)}
+    .ai-btn{width:100%;margin-top:.6rem;padding:.6rem 1rem;background:linear-gradient(135deg,#5b2d7a,#3a1a50);border:1px solid var(--purple2);border-radius:6px;color:#d0a0f5;font-size:.88rem;cursor:pointer;transition:all .2s;font-family:Georgia,serif}
+    .ai-btn:hover{background:linear-gradient(135deg,#7a3aa0,#4a2060);box-shadow:0 0 20px rgba(138,77,181,.3)}
+    .ai-btn:disabled{opacity:.5;cursor:not-allowed}
+    .ai-status{font-size:.78rem;color:var(--muted);margin-top:.5rem;min-height:1.2em;font-style:italic}
+    .ai-status.error{color:var(--red2)}
+    .ai-status.ok{color:var(--green2)}
+
+    /* Parsed char preview */
+    .parsed-preview{background:var(--bg3);border:1px solid var(--border2);border-radius:7px;padding:.9rem 1rem;margin-top:.8rem;display:none}
+    .parsed-preview.open{display:block}
+    .parsed-name{font-size:1.1rem;font-weight:700;color:var(--gold2);margin-bottom:.3rem}
+    .parsed-sub{font-size:.82rem;color:var(--text2);margin-bottom:.7rem}
+    .parsed-stats{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.7rem}
+    .pstat{background:var(--bg4);border:1px solid var(--border);border-radius:4px;padding:.2rem .5rem;font-size:.78rem;color:var(--text2)}
+    .pstat strong{color:var(--gold2)}
+    .parsed-actions{display:flex;gap:.5rem;margin-top:.7rem}
+
+    /* Notes area (full width) */
+    .notes-section{grid-column:1/-1;background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+    .notes-inner{padding:1rem;display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+    @media(max-width:700px){.notes-inner{grid-template-columns:1fr}}
+    .notes-label{font-size:.7rem;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:.4rem}
+    .notes-textarea{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:6px;color:var(--text);padding:.7rem;font-size:.85rem;font-family:Georgia,serif;resize:vertical;min-height:180px;line-height:1.5}
+    .notes-textarea:focus{outline:none;border-color:var(--gold)}
+    .notes-output{background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:.7rem;min-height:180px;font-size:.82rem;color:var(--text2);line-height:1.6;overflow-y:auto;white-space:pre-wrap}
+    .notes-output h1,.notes-output h2,.notes-output h3{color:var(--gold2);margin:.5rem 0 .2rem;font-size:.88rem}
+    .notes-output h1{font-size:1rem}
+    .notes-output ul{padding-left:1.2rem}
+    .notes-output li{margin:.15rem 0}
+
+    /* Session list */
+    .session-item{padding:.6rem .8rem;border-radius:6px;border:1px solid var(--border);background:var(--bg3);cursor:pointer;margin-bottom:.4rem;transition:all .18s}
+    .session-item:hover{border-color:var(--border2);background:var(--bg4)}
+    .session-item.active{border-color:var(--gold);background:var(--bg4)}
+    .session-item-name{font-size:.85rem;font-weight:700;color:var(--text);margin-bottom:.2rem}
+    .session-item-date{font-size:.72rem;color:var(--muted)}
+    .session-item-preview{font-size:.73rem;color:var(--text2);margin-top:.2rem;opacity:.7;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    /* NPC card extras */
+    .npc-role{display:inline-block;padding:.1rem .45rem;border-radius:10px;font-size:.68rem;font-weight:700;letter-spacing:.04em;margin-left:.4rem}
+    .npc-role.aliado{background:rgba(45,107,74,.3);color:var(--green2);border:1px solid var(--green2)}
+    .npc-role.inimigo{background:rgba(155,35,53,.3);color:var(--red2);border:1px solid var(--red2)}
+    .npc-role.neutro{background:rgba(58,46,30,.3);color:var(--text2);border:1px solid var(--border2)}
+    .npc-role.comerciante,.npc-role.informante{background:rgba(91,45,122,.3);color:var(--purple2);border:1px solid var(--purple2)}
+    .npc-role.rival{background:rgba(201,150,58,.2);color:var(--gold2);border:1px solid var(--gold)}
+    /* AI badge */
+    .ai-badge{display:inline-flex;align-items:center;gap:.3rem;background:rgba(138,77,181,.15);border:1px solid var(--purple2);border-radius:10px;padding:.15rem .5rem;font-size:.68rem;color:var(--purple2)}
+
+    /* Spinner */
+    .spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--border2);border-top-color:var(--gold2);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:.3rem}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* ══ FERRAMENTAS ══ */
+    #tab-ferramentas{padding:1.2rem;max-width:1400px;margin:0 auto}
+    .tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(360px,100%),1fr));gap:1.2rem}
+    .tool-panel{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+    .tool-header{padding:.65rem 1rem;font-size:.78rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;border-bottom:1px solid var(--border)}
+    .tool-header.gold{background:linear-gradient(135deg,#3a2808,#1f1508);color:var(--gold3);border-bottom-color:#6b4a10}
+    .tool-header.red{background:linear-gradient(135deg,#3a0d14,#1f0a0d);color:#f5a0b0;border-bottom-color:#6b1525}
+    .tool-header.blue{background:linear-gradient(135deg,#0a1a3a,#06101f);color:#a0c0f5;border-bottom-color:#153075}
+    .tool-header.green{background:linear-gradient(135deg,#0a2a18,#061508);color:#a0f0c0;border-bottom-color:#154a30}
+    .tool-header.purple{background:linear-gradient(135deg,#1e0a3a,#10051f);color:#d0a0f5;border-bottom-color:#4a1580}
+    .tool-body{padding:1rem}
+    .dice-quick{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:.8rem}
+    .die-btn{padding:.4rem .7rem;border:1px solid var(--border2);border-radius:5px;background:var(--bg3);color:var(--text2);font-size:.82rem;cursor:pointer;transition:all .18s;font-family:Georgia,serif}
+    .die-btn:hover{border-color:var(--gold);color:var(--gold2);background:var(--bg4)}
+    .die-btn.d20{border-color:var(--gold);color:var(--gold2)}
+    .dice-input-row{display:flex;gap:.5rem;margin-bottom:.6rem}
+    .dice-input{flex:1;background:var(--bg3);border:1px solid var(--border2);border-radius:5px;color:var(--text);padding:.45rem .7rem;font-size:.9rem;font-family:Georgia,serif}
+    .dice-input:focus{outline:none;border-color:var(--gold)}
+    .dice-roll-btn{padding:.45rem 1rem;background:var(--gold);color:#0d0b05;border:none;border-radius:5px;font-weight:700;font-size:.88rem;cursor:pointer;font-family:Georgia,serif;transition:all .2s}
+    .dice-roll-btn:hover{background:var(--gold2)}
+    .dice-result{background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:.8rem 1rem;min-height:4rem;text-align:center}
+    .dice-total{font-size:2.5rem;font-weight:700;color:var(--gold2);line-height:1}
+    .dice-detail{font-size:.78rem;color:var(--text2);margin-top:.3rem}
+    .dice-history{margin-top:.6rem;max-height:120px;overflow-y:auto}
+    .dice-hist-item{font-size:.75rem;color:var(--muted);padding:.15rem 0;border-bottom:1px solid rgba(58,46,30,.3);display:flex;justify-content:space-between}
+    .dice-hist-item:last-child{border-bottom:none}
+    .dice-hist-val{color:var(--gold2);font-weight:700}
+    .name-race-grid{display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.7rem}
+    .race-btn{padding:.3rem .6rem;border:1px solid var(--border2);border-radius:4px;background:var(--bg3);color:var(--text2);font-size:.75rem;cursor:pointer;transition:all .15s}
+    .race-btn:hover,.race-btn.sel{border-color:var(--gold);color:var(--gold2);background:var(--bg4)}
+    .name-result{background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:.8rem 1rem;text-align:center;cursor:pointer;min-height:3rem}
+    .name-big{font-size:1.5rem;font-weight:700;color:var(--gold2);letter-spacing:.04em}
+    .name-sub{font-size:.75rem;color:var(--muted);margin-top:.2rem}
+    .weather-result{background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:.8rem 1rem}
+    .weather-row{display:flex;align-items:center;gap:.7rem;padding:.3rem 0;border-bottom:1px solid rgba(58,46,30,.3)}
+    .weather-row:last-child{border-bottom:none}
+    .weather-label{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;min-width:80px}
+    .weather-val{font-size:.88rem;color:var(--text)}
+    .treasure-cr-row{display:flex;flex-wrap:wrap;gap:.35rem;margin-bottom:.7rem}
+    .cr-btn{padding:.3rem .55rem;border:1px solid var(--border2);border-radius:4px;background:var(--bg3);color:var(--text2);font-size:.75rem;cursor:pointer;transition:all .15s}
+    .cr-btn:hover,.cr-btn.sel{border-color:var(--gold);color:var(--gold2);background:var(--bg4)}
+    .treasure-result{background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:.8rem 1rem;min-height:3rem}
+    .treasure-coins{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:.5rem}
+    .coin{padding:.2rem .5rem;border-radius:10px;font-size:.78rem;font-weight:700}
+    .coin.po{background:rgba(201,150,58,.2);color:var(--gold2);border:1px solid var(--gold)}
+    .coin.pp{background:rgba(200,200,200,.1);color:#c0c0c0;border:1px solid #888}
+    .coin.pc{background:rgba(150,100,50,.1);color:#c08040;border:1px solid #8a5a30}
+    .coin.pe{background:rgba(150,150,250,.1);color:#a0a0f0;border:1px solid #6060c0}
+    .treasure-items{font-size:.82rem;color:var(--text2);line-height:1.7}
+    /* NPC detail modal */
+    .stat-block{font-size:.82rem;color:var(--text2);line-height:1.6}
+    .stat-block .sb-name{font-size:1.1rem;font-weight:700;color:var(--gold2);margin-bottom:.1rem}
+    .stat-block .sb-sub{color:var(--text2);font-style:italic;margin-bottom:.6rem;font-size:.85rem}
+    .stat-block .sb-divider{border:none;border-top:2px solid var(--gold);margin:.5rem 0}
+    .stat-block .sb-attrs{display:grid;grid-template-columns:repeat(6,1fr);gap:.3rem;text-align:center;margin:.6rem 0;padding:.5rem;background:var(--bg3);border-radius:6px}
+    .stat-block .sb-attr-name{font-size:.65rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+    .stat-block .sb-attr-val{font-size:.95rem;font-weight:700;color:var(--text)}
+    .stat-block .sb-attr-mod{font-size:.72rem;color:var(--gold2)}
+    .stat-block .sb-line{margin:.2rem 0}
+    .stat-block .sb-line strong{color:var(--text)}
+    .stat-block .sb-section{margin-top:.5rem;padding-top:.5rem;border-top:1px solid var(--border)}
+    .stat-block .sb-section-title{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gold3);margin-bottom:.3rem}
+    .stat-block .sb-action{margin:.4rem 0}
+    .stat-block .sb-action-name{font-weight:700;color:var(--text);font-style:italic}
+    .stat-block .sb-spell-level{margin:.2rem 0;padding-left:.5rem}
+    @media(max-width:700px){.narr-controls{grid-template-columns:1fr 1fr !important}}
+
+    footer{text-align:center;padding:1.5rem;color:var(--muted);font-size:.75rem;font-style:italic;border-top:1px solid var(--border);margin-top:1rem}
+    ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}::-webkit-scrollbar-thumb:hover{background:var(--gold)}
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="hdr-sub">⚔ Dungeons &amp; Dragons 5ª Edição ⚔</div>
+  <h1><span>Yo</span>Master<span>.dnd</span></h1>
+  <p class="hdr-tagline">O Escudo Digital do Mestre</p>
+  <div class="hdr-rule"></div>
+</header>
+
+<!-- TAB NAV -->
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="switchTab('referencia',this)">📜 Referência</button>
+  <button class="tab-btn" onclick="switchTab('combate',this)">⚔️ Combate &amp; Turnos</button>
+  <button class="tab-btn" onclick="switchTab('fichas',this)">🧙 Fichas</button>
+  <button class="tab-btn" onclick="switchTab('npcs',this)">👥 NPCs</button>
+  <button class="tab-btn" onclick="switchTab('sessoes',this)">📝 Sessões</button>
+  <button class="tab-btn" onclick="switchTab('ferramentas',this)">🎲 Ferramentas</button>
+</div>
+
+<!-- STATIC MODE BANNER -->
+<div id="static-banner" style="display:none;background:rgba(91,45,122,.12);border-bottom:1px solid rgba(138,77,181,.4);padding:.4rem 1.2rem;font-size:.75rem;color:var(--purple2);display:none;align-items:center;gap:.8rem;flex-wrap:wrap">
+  <span style="font-weight:700">🌐 Modo Estático</span>
+  <span style="color:var(--text2);flex:1">Dados salvos no navegador (localStorage) · IA via Groq diretamente</span>
+  <button onclick="openGroqKeyConfig()" style="background:rgba(138,77,181,.2);border:1px solid var(--purple2);border-radius:4px;color:var(--purple2);padding:.2rem .7rem;font-size:.72rem;cursor:pointer;font-family:Georgia,serif">⚙ Configurar Chave Groq</button>
+</div>
+
+<!-- REF SUBNAV -->
+<nav class="ref-nav" id="ref-nav">
+  <a href="#combate-ref" onclick="switchTab('referencia');scrollTo('#combate-ref')">⚔ Combate</a>
+  <a href="#acoes-ref">📋 Ações</a>
+  <a href="#condicoes-ref">🩸 Condições</a>
+  <a href="#hab-ref">🎲 Perícias</a>
+  <a href="#dc-ref">🎯 CD</a>
+  <a href="#exp-ref">🗺 Exploração</a>
+  <a href="#magia-ref">✨ Magia</a>
+  <a href="#npc-ref">👥 NPCs</a>
+  <a href="#morte-ref">💀 Morte</a>
+  <a href="#dano-ref">🔥 Dano</a>
+  <a href="#xp-ref">⭐ XP</a>
+</nav>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- TAB: REFERÊNCIA                           -->
+<!-- ══════════════════════════════════════════ -->
+<div class="tab-content active" id="tab-referencia">
+<div class="screen">
+
+  <!-- COMBATE -->
+  <div class="divider" id="combate-ref"><div class="divider-line"></div><div class="divider-title">⚔ Combate</div><div class="divider-line"></div></div>
+
+  <div class="panel">
+    <div class="panel-header gold">🎲 Fórmulas de Combate</div>
+    <div class="panel-body">
+      <div class="formula-box"><div class="formula-label">Iniciativa</div><div class="formula">d20 <span>+</span> Mod. Destreza</div></div>
+      <div class="formula-box"><div class="formula-label">Jogada de Ataque</div><div class="formula">d20 <span>+</span> Mod. Atributo <span>+</span> Proficiência</div></div>
+      <div class="formula-box"><div class="formula-label">Classe de Armadura (base)</div><div class="formula">10 <span>+</span> Mod. Destreza</div></div>
+      <div class="formula-box" style="margin-bottom:0"><div class="formula-label">CD Magia</div><div class="formula">8 <span>+</span> Proficiência <span>+</span> Mod. Conjuração</div></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-header blue">🛡 Cobertura &amp; Iluminação</div>
+    <div class="panel-body">
+      <div class="cover-item"><div class="cover-bonus">+2</div><div class="cover-desc"><strong style="color:var(--gold2)">Meia Cobertura</strong> — CA e TR de Destreza. Metade do corpo coberto.</div></div>
+      <div class="cover-item"><div class="cover-bonus">+5</div><div class="cover-desc"><strong style="color:var(--gold2)">Três Quartos</strong> — CA e TR de Destreza. Porta, tronco, etc.</div></div>
+      <div class="cover-item"><div class="cover-bonus" style="color:var(--red2)">—</div><div class="cover-desc"><strong style="color:var(--red2)">Cobertura Total</strong> — Não pode ser alvo diretamente.</div></div>
+      <div class="light-grid" style="margin-top:.7rem">
+        <div class="light-card"><div class="light-icon">☀️</div><div class="light-name">Luz Plena</div><div class="light-desc">Sem penalidade.</div></div>
+        <div class="light-card"><div class="light-icon">🌓</div><div class="light-name">Penumbra</div><div class="light-desc">Desv. Percepção (visão). Criatura obscura.</div></div>
+        <div class="light-card"><div class="light-icon">🌑</div><div class="light-name">Escuridão</div><div class="light-desc">Cegado. Ataques: vantagem/desvantagem.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-header gold">🏃 Movimento</div>
+    <div class="panel-body">
+      <table>
+        <thead><tr><th>Situação</th><th>Custo</th></tr></thead>
+        <tbody>
+          <tr><td>Terreno Difícil</td><td>×2 movimento</td></tr>
+          <tr><td>Escalar / Nadar</td><td>×2 (sem deslocamento especial)</td></tr>
+          <tr><td>Rastejar</td><td>×2</td></tr>
+          <tr><td>Erguer do Prono</td><td>Metade do deslocamento</td></tr>
+          <tr><td>Salto comprimento</td><td>Força × 30cm (c/ impulso)</td></tr>
+          <tr><td>Salto altura</td><td>3 + Mod. FOR (c/ impulso)</td></tr>
+          <tr><td>Queda (a cada 3m)</td><td>1d6 contundente (máx. 20d6)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- AÇÕES -->
+  <div class="divider" id="acoes-ref"><div class="divider-line"></div><div class="divider-title">📋 Ações em Combate</div><div class="divider-line"></div></div>
+
+  <div class="panel">
+    <div class="panel-header red">⚔️ Ações (1 por turno)</div>
+    <div class="panel-body">
+      <div class="action-item"><div class="action-name">Atacar</div><div class="action-desc">Um ou mais ataques (corpo a corpo ou à distância).</div></div>
+      <div class="action-item"><div class="action-name">Conjurar Magia</div><div class="action-desc">Magia com tempo de 1 ação. Bônus e reação têm seus próprios tempos.</div></div>
+      <div class="action-item"><div class="action-name">Correr (Dash)</div><div class="action-desc">Dobra deslocamento disponível neste turno.</div></div>
+      <div class="action-item"><div class="action-name">Desengajar</div><div class="action-desc">Movimento não provoca ataques de oportunidade.</div></div>
+      <div class="action-item"><div class="action-name">Esquivar</div><div class="action-desc">Ataques contra você: desvantagem. Você: vantagem em TR DES. Até início do próximo turno.</div></div>
+      <div class="action-item"><div class="action-name">Ajudar</div><div class="action-desc">Aliado: vantagem no próximo teste ou ataque.</div></div>
+      <div class="action-item"><div class="action-name">Esconder</div><div class="action-desc">Teste de Furtividade vs. Percepção. Ataca de surpresa.</div></div>
+      <div class="action-item"><div class="action-name">Preparar</div><div class="action-desc">Declara ação e gatilho. Usa como reação.</div></div>
+      <div class="action-item"><div class="action-name">Agarrar / Empurrar</div><div class="action-desc">Atletismo vs. Atletismo ou Acrobacia do alvo.</div></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-header blue">⚡ Ação Bônus &amp; Reação</div>
+    <div class="panel-body">
+      <div class="action-item bonus"><div class="action-name">Arma Secundária</div><div class="action-desc">Duas armas leves. Sem mod. de atributo ao dano (a menos que negativo).</div></div>
+      <div class="action-item bonus"><div class="action-name">Magia (Ação Bônus)</div><div class="action-desc">Só pode conjurar truque como outra magia no mesmo turno.</div></div>
+      <div class="action-item bonus"><div class="action-name">Ladino Ágil</div><div class="action-desc">Correr, Desengajar ou Esconder como ação bônus.</div></div>
+      <div style="border-top:1px solid var(--border);padding-top:.7rem;margin-top:.7rem">
+        <div class="action-item reaction"><div class="action-name">Ataque de Oportunidade</div><div class="action-desc">Criatura hostil visível sai do seu alcance. Um ataque corpo a corpo.</div></div>
+        <div class="action-item reaction"><div class="action-name">Magia Preparada</div><div class="action-desc">Quando gatilho ocorre. Usa reação.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONDIÇÕES -->
+  <div class="divider" id="condicoes-ref"><div class="divider-line"></div><div class="divider-title">🩸 Condições</div><div class="divider-line"></div></div>
+
+  <div class="panel wide">
+    <div class="panel-header red">🩸 Condições</div>
+    <div class="panel-body">
+      <div class="conditions-grid">
+        <div class="condition"><div class="condition-name">Cego</div><p>Falha em testes que requerem visão.</p><p>Ataques seus: desvantagem. Contra você: vantagem.</p></div>
+        <div class="condition blue-acc"><div class="condition-name">Enfeitiçado</div><p>Não pode atacar o encantador.</p><p>Encantador: vantagem em Carisma contra você.</p></div>
+        <div class="condition purple-acc"><div class="condition-name">Surdo</div><p>Falha em testes que requerem audição.</p></div>
+        <div class="condition"><div class="condition-name">Amedrontado</div><p>Desvantagem em testes e ataques enquanto fonte visível.</p><p>Não pode se mover em direção à fonte.</p></div>
+        <div class="condition green-acc"><div class="condition-name">Agarrado</div><p>Deslocamento = 0.</p><p>Termina ao sair do alcance do agarrador.</p></div>
+        <div class="condition purple-acc"><div class="condition-name">Incapacitado</div><p>Sem ações nem ações bônus.</p></div>
+        <div class="condition gold-acc"><div class="condition-name">Invisível</div><p>Ataques seus: vantagem. Contra você: desvantagem.</p></div>
+        <div class="condition"><div class="condition-name">Paralisado</div><p>Incapacitado. TR FOR/DES: falha automática.</p><p>Ataques a 1,5m: crítico automático.</p></div>
+        <div class="condition purple-acc"><div class="condition-name">Petrificado</div><p>Incapacitado. Resistência a todos os danos.</p><p>Imune a veneno e doença.</p></div>
+        <div class="condition"><div class="condition-name">Envenenado</div><p>Desvantagem em ataques e testes de habilidade.</p></div>
+        <div class="condition blue-acc"><div class="condition-name">Prono</div><p>Corpo a corpo contra você: vantagem. Distância: desvantagem.</p><p>Seus ataques: desvantagem.</p></div>
+        <div class="condition green-acc"><div class="condition-name">Contido</div><p>Deslocamento 0. Seus ataques: desvantagem.</p><p>Contra você: vantagem. TR DES: desvantagem.</p></div>
+        <div class="condition"><div class="condition-name">Atordoado</div><p>Incapacitado. TR FOR/DES: falha automática.</p><p>Ataques contra você: vantagem.</p></div>
+        <div class="condition"><div class="condition-name">Inconsciente</div><p>Incapacitado. Cai Prono. TR FOR/DES: falha automática.</p><p>Golpes a 1,5m: crítico automático.</p></div>
+        <div class="condition gold-acc"><div class="condition-name">Concentração</div><p>Receber dano: TR CON CD 10 ou ½ do dano.</p><p>Incapacitado ou morto: perde concentração.</p></div>
+      </div>
+      <div style="margin-top:.8rem">
+        <div style="font-size:.7rem;font-weight:700;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.4rem">EXAUSTÃO</div>
+        <div class="ex-bar">
+          <div class="ex-level"><span class="n">1</span><span class="l">Desv. Testes</span></div>
+          <div class="ex-level"><span class="n">2</span><span class="l">Deslocam. ÷2</span></div>
+          <div class="ex-level"><span class="n">3</span><span class="l">Desv. Ataques</span></div>
+          <div class="ex-level"><span class="n">4</span><span class="l">PV máx ÷2</span></div>
+          <div class="ex-level"><span class="n">5</span><span class="l">Desloc. = 0</span></div>
+          <div class="ex-level"><span class="n">6</span><span class="l">Morte</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PERÍCIAS -->
+  <div class="divider" id="hab-ref"><div class="divider-line"></div><div class="divider-title">🎲 Perícias &amp; Atributos</div><div class="divider-line"></div></div>
+
+  <div class="panel wide">
+    <div class="panel-header green">🎲 Perícias por Atributo</div>
+    <div class="panel-body">
+      <div class="skills-grid">
+        <div><div class="skill-attr">Força</div><div class="skill-item">Atletismo</div></div>
+        <div><div class="skill-attr">Destreza</div><div class="skill-item">Acrobacia</div><div class="skill-item">Prestidigitação</div><div class="skill-item">Furtividade</div></div>
+        <div><div class="skill-attr">Inteligência</div><div class="skill-item">Arcanismo</div><div class="skill-item">História</div><div class="skill-item">Investigação</div><div class="skill-item">Natureza</div><div class="skill-item">Religião</div></div>
+        <div><div class="skill-attr">Sabedoria</div><div class="skill-item">Intuição</div><div class="skill-item">Medicina</div><div class="skill-item">Percepção</div><div class="skill-item">Sobrevivência</div><div class="skill-item">Trato c/ Animais</div></div>
+        <div><div class="skill-attr">Carisma</div><div class="skill-item">Enganação</div><div class="skill-item">Intimidação</div><div class="skill-item">Atuação</div><div class="skill-item">Persuasão</div></div>
+        <div><div class="skill-attr">Bônus de Prof.</div><table style="width:100%;margin-top:.3rem"><tbody><tr><td style="padding:.15rem .3rem">Nív. 1–4</td><td style="padding:.15rem;color:var(--gold2)">+2</td></tr><tr><td style="padding:.15rem .3rem">Nív. 5–8</td><td style="padding:.15rem;color:var(--gold2)">+3</td></tr><tr><td style="padding:.15rem .3rem">Nív. 9–12</td><td style="padding:.15rem;color:var(--gold2)">+4</td></tr><tr><td style="padding:.15rem .3rem">Nív. 13–16</td><td style="padding:.15rem;color:var(--gold2)">+5</td></tr><tr><td style="padding:.15rem .3rem">Nív. 17–20</td><td style="padding:.15rem;color:var(--gold2)">+6</td></tr></tbody></table></div>
+      </div>
+      <table style="margin-top:.7rem">
+        <thead><tr><th>Atributo</th><th>1</th><th>2–3</th><th>4–5</th><th>6–7</th><th>8–9</th><th>10–11</th><th>12–13</th><th>14–15</th><th>16–17</th><th>18–19</th><th>20–21</th></tr></thead>
+        <tbody><tr><td>Mod.</td><td style="color:#c04040;text-align:center">−5</td><td style="color:#c04040;text-align:center">−4</td><td style="color:#c04040;text-align:center">−3</td><td style="color:#d08040;text-align:center">−2</td><td style="color:#d08040;text-align:center">−1</td><td style="text-align:center">+0</td><td style="color:#8aee8a;text-align:center">+1</td><td style="color:#8aee8a;text-align:center">+2</td><td style="color:#4acf8a;text-align:center">+3</td><td style="color:#4acf8a;text-align:center">+4</td><td style="color:var(--gold2);text-align:center">+5</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- CD -->
+  <div class="divider" id="dc-ref"><div class="divider-line"></div><div class="divider-title">🎯 Classes de Dificuldade</div><div class="divider-line"></div></div>
+
+  <div class="panel">
+    <div class="panel-header gold">🎯 CD — Dificuldade</div>
+    <div class="panel-body">
+      <div class="dc-item"><div class="dc-num">5</div><div class="dc-label">Muito Fácil</div><div class="dc-ex">Levantar uma pedra</div></div>
+      <div class="dc-item"><div class="dc-num">10</div><div class="dc-label">Fácil</div><div class="dc-ex">Trepar uma corda</div></div>
+      <div class="dc-item"><div class="dc-num">15</div><div class="dc-label">Médio</div><div class="dc-ex">Abrir fechadura</div></div>
+      <div class="dc-item"><div class="dc-num">20</div><div class="dc-label">Difícil</div><div class="dc-ex">Nadar em correnteza</div></div>
+      <div class="dc-item"><div class="dc-num">25</div><div class="dc-label">Muito Difícil</div><div class="dc-ex">Arrombar porta de aço</div></div>
+      <div class="dc-item"><div class="dc-num">30</div><div class="dc-label">Quase Impossível</div><div class="dc-ex">Tarefa sobre-humana</div></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-header dark">👁 Percepção Passiva</div>
+    <div class="panel-body">
+      <div class="formula-box"><div class="formula-label">Percepção Passiva</div><div class="formula">10 <span>+</span> Mod. SAB <span>+</span> Prof.</div></div>
+      <div class="formula-box" style="margin-bottom:.6rem"><div class="formula-label">Investigação Passiva</div><div class="formula">10 <span>+</span> Mod. INT <span>+</span> Prof.</div></div>
+      <table><thead><tr><th>Condição</th><th>Ajuste na Passiva</th></tr></thead><tbody><tr><td>Com vantagem</td><td style="color:var(--green2)">+5</td></tr><tr><td>Com desvantagem</td><td style="color:var(--red2)">−5</td></tr></tbody></table>
+    </div>
+  </div>
+
+  <!-- EXPLORAÇÃO -->
+  <div class="divider" id="exp-ref"><div class="divider-line"></div><div class="divider-title">🗺 Exploração</div><div class="divider-line"></div></div>
+
+  <div class="panel">
+    <div class="panel-header green">🗺 Ritmo de Viagem</div>
+    <div class="panel-body">
+      <div class="travel-grid">
+        <div class="travel-card"><div>⚡</div><div class="travel-name">Rápido</div><div class="travel-speed">5,5 km/h</div><div class="travel-day">44 km/dia</div><div class="travel-effect">−5 Percepção Passiva. Sem Furtividade.</div></div>
+        <div class="travel-card"><div>🚶</div><div class="travel-name">Normal</div><div class="travel-speed">4,5 km/h</div><div class="travel-day">36 km/dia</div><div class="travel-effect">Sem penalidades.</div></div>
+        <div class="travel-card"><div>🐢</div><div class="travel-name">Lento</div><div class="travel-speed">2,5 km/h</div><div class="travel-day">27 km/dia</div><div class="travel-effect">Pode usar Furtividade e criar mapa.</div></div>
+      </div>
+      <table style="margin-top:.7rem"><thead><tr><th>Atividade</th><th>Teste</th></tr></thead><tbody>
+        <tr><td>Navegar</td><td>Sobrevivência vs. CD do terreno</td></tr>
+        <tr><td>Rastrear</td><td>Sobrevivência vs. CD do rastro</td></tr>
+        <tr><td>Forragear</td><td>Sobrevivência CD 15 / 10 (abundante)</td></tr>
+        <tr><td>Estabilizar</td><td>Medicina CD 10 (ação)</td></tr>
+      </tbody></table>
+      <table style="margin-top:.6rem"><thead><tr><th>Descanso</th><th>Duração</th><th>Benefícios</th></tr></thead><tbody>
+        <tr><td>Curto</td><td>≥ 1h</td><td>Gasta Dados de Vida. Recarga de habilidades.</td></tr>
+        <tr><td>Longo</td><td>≥ 8h</td><td>PV máximos. Metade dos DV. Slots de magia. −1 exaustão.</td></tr>
+      </tbody></table>
+    </div>
+  </div>
+
+  <!-- MAGIA -->
+  <div class="divider" id="magia-ref"><div class="divider-line"></div><div class="divider-title">✨ Magia</div><div class="divider-line"></div></div>
+
+  <div class="panel">
+    <div class="panel-header purple">📚 Escolas de Magia</div>
+    <div class="panel-body">
+      <div class="magic-grid">
+        <div class="magic-school"><div class="magic-name">Abjuração</div><div class="magic-desc">Proteção, banimento, barreiras.</div></div>
+        <div class="magic-school"><div class="magic-name">Conjuração</div><div class="magic-desc">Invocar criaturas, teletransportar.</div></div>
+        <div class="magic-school"><div class="magic-name">Adivinhação</div><div class="magic-desc">Revelar informações, prever o futuro.</div></div>
+        <div class="magic-school"><div class="magic-name">Encantamento</div><div class="magic-desc">Influenciar mentes, enfeitiçar.</div></div>
+        <div class="magic-school"><div class="magic-name">Evocação</div><div class="magic-desc">Energia destrutiva: fogo, gelo, relâmpago.</div></div>
+        <div class="magic-school"><div class="magic-name">Ilusão</div><div class="magic-desc">Enganar sentidos, criar imagens falsas.</div></div>
+        <div class="magic-school"><div class="magic-name">Necromancia</div><div class="magic-desc">Mortos-vivos, drenar força vital.</div></div>
+        <div class="magic-school"><div class="magic-name">Transmutação</div><div class="magic-desc">Alterar propriedades de criaturas e objetos.</div></div>
+      </div>
+      <table style="margin-top:.7rem"><thead><tr><th>Atributo de Conjuração</th><th>Classe</th></tr></thead><tbody>
+        <tr><td>Inteligência</td><td>Mago, Guerreiro Arcano</td></tr>
+        <tr><td>Sabedoria</td><td>Clérigo, Druida, Ranger</td></tr>
+        <tr><td>Carisma</td><td>Bardo, Feiticeiro, Bruxo, Paladino</td></tr>
+      </tbody></table>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-header purple">✨ Slots de Magia (Nív. 1–20)</div>
+    <div class="panel-body" style="overflow-x:auto">
+      <table style="font-size:.8rem">
+        <thead><tr><th>Nív.</th><th>1º</th><th>2º</th><th>3º</th><th>4º</th><th>5º</th><th>6º</th><th>7º</th><th>8º</th><th>9º</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>2</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr><td>2</td><td>3</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr><td>3</td><td>4</td><td>2</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr><td>4</td><td>4</td><td>3</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr><td>5</td><td>4</td><td>3</td><td>2</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr><td>7</td><td>4</td><td>3</td><td>3</td><td>1</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr><td>9</td><td>4</td><td>3</td><td>3</td><td>3</td><td>1</td><td>—</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr><td>11</td><td>4</td><td>3</td><td>3</td><td>3</td><td>2</td><td>1</td><td>—</td><td>—</td><td>—</td></tr>
+          <tr><td>13</td><td>4</td><td>3</td><td>3</td><td>3</td><td>2</td><td>1</td><td>1</td><td>—</td><td>—</td></tr>
+          <tr><td>15</td><td>4</td><td>3</td><td>3</td><td>3</td><td>2</td><td>1</td><td>1</td><td>1</td><td>—</td></tr>
+          <tr><td>17</td><td>4</td><td>3</td><td>3</td><td>3</td><td>2</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
+          <tr><td>20</td><td>4</td><td>3</td><td>3</td><td>3</td><td>3</td><td>2</td><td>2</td><td>1</td><td>1</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- NPCS -->
+  <div class="divider" id="npc-ref"><div class="divider-line"></div><div class="divider-title">👥 NPCs</div><div class="divider-line"></div></div>
+
+  <div class="panel wide">
+    <div class="panel-header gold">👥 Atitudes &amp; Gerador de NPC</div>
+    <div class="panel-body">
+      <table style="margin-bottom:.8rem"><thead><tr><th>Atitude</th><th>Comportamento</th><th>Mudar para Amigável</th></tr></thead><tbody>
+        <tr><td style="color:var(--red2)">Hostil</td><td>Deseja prejudicar. Pode atacar.</td><td>CD 20 Persuasão</td></tr>
+        <tr><td>Indiferente</td><td>Age por interesse próprio.</td><td>CD 15 Persuasão</td></tr>
+        <tr><td style="color:var(--green2)">Amigável</td><td>Quer ajudar.</td><td>CD 10 para tarefas simples</td></tr>
+      </tbody></table>
+      <div class="npc-cols">
+        <div><div class="npc-col-title">Traço (d8)</div><div class="npc-item">Direto e factual</div><div class="npc-item">Adora histórias</div><div class="npc-item">Supersticioso</div><div class="npc-item">Desconfia de estranhos</div><div class="npc-item">Generoso demais</div><div class="npc-item">Obstinado e teimoso</div><div class="npc-item">Humor sardônico</div><div class="npc-item">Otimista inveterado</div></div>
+        <div><div class="npc-col-title">Ideal (d6)</div><div class="npc-item">Poder — controlo meu destino</div><div class="npc-item">Beleza — arte acima de tudo</div><div class="npc-item">Justiça — todos são iguais</div><div class="npc-item">Liberdade — nada me prende</div><div class="npc-item">Tradição — respeito costumes</div><div class="npc-item">Ganância — ouro fala mais</div></div>
+        <div><div class="npc-col-title">Vínculo / Fraqueza (d6)</div><div class="npc-item">Protege familiar distante</div><div class="npc-item">Dívida com criminoso</div><div class="npc-item">Medo de altura/água</div><div class="npc-item">Guarda segredo vergonhoso</div><div class="npc-item">Apaixona-se fácil</div><div class="npc-item">Não recusa desafios</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MORTE -->
+  <div class="divider" id="morte-ref"><div class="divider-line"></div><div class="divider-title">💀 Morte</div><div class="divider-line"></div></div>
+
+  <div class="panel">
+    <div class="panel-header red">💀 Testes de Morte</div>
+    <div class="panel-body">
+      <div class="death-grid">
+        <div class="death-card ok"><div class="death-title">Sucessos</div><div class="death-circles"><div class="death-circle"></div><div class="death-circle"></div><div class="death-circle"></div></div><div class="death-text">3 = Estabilizado (0 PV, sem mais testes).</div></div>
+        <div class="death-card fail"><div class="death-title">Falhas</div><div class="death-circles"><div class="death-circle"></div><div class="death-circle"></div><div class="death-circle"></div></div><div class="death-text">3 = Morte permanente.</div></div>
+      </div>
+      <table style="margin-top:.7rem"><thead><tr><th>Evento</th><th>Efeito</th></tr></thead><tbody>
+        <tr><td>Rolar 1 natural</td><td style="color:var(--red2)">2 falhas de morte</td></tr>
+        <tr><td>Rolar 20 natural</td><td style="color:var(--green2)">Recupera 1 PV, fica consciente</td></tr>
+        <tr><td>Receber dano a 0 PV</td><td style="color:var(--red2)">1 falha (corpo a corpo: 2 se no mesmo espaço)</td></tr>
+        <tr><td>Estabilizar</td><td>Medicina CD 10 como ação</td></tr>
+        <tr><td>Acordar estabilizado</td><td>Após 1d4h, com 1 PV</td></tr>
+      </tbody></table>
+    </div>
+  </div>
+
+  <!-- DANO -->
+  <div class="divider" id="dano-ref"><div class="divider-line"></div><div class="divider-title">🔥 Dano</div><div class="divider-line"></div></div>
+
+  <div class="panel wide">
+    <div class="panel-header red">🔥 Tipos de Dano &amp; Mecânicas</div>
+    <div class="panel-body">
+      <div style="margin-bottom:.6rem"><span style="font-size:.7rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase">FÍSICO — </span><span class="dmg-tag p">Cortante</span><span class="dmg-tag p">Perfurante</span><span class="dmg-tag p">Contundente</span></div>
+      <div style="margin-bottom:.6rem"><span style="font-size:.7rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase">ELEMENTAL — </span><span class="dmg-tag e">Fogo</span><span class="dmg-tag e">Frio</span><span class="dmg-tag e">Elétrico</span><span class="dmg-tag e">Ácido</span><span class="dmg-tag e">Trovão</span></div>
+      <div style="margin-bottom:.7rem"><span style="font-size:.7rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase">MÁGICO — </span><span class="dmg-tag m">Força</span><span class="dmg-tag m">Psíquico</span><span class="dmg-tag r">Radiante</span><span class="dmg-tag n">Necrótico</span><span class="dmg-tag m">Veneno</span></div>
+      <table><thead><tr><th>Conceito</th><th>Efeito</th></tr></thead><tbody>
+        <tr><td>Resistência</td><td>Dano ÷ 2 (arredonda para baixo)</td></tr>
+        <tr><td>Vulnerabilidade</td><td>Dano × 2</td></tr>
+        <tr><td>Imunidade</td><td>Dano = 0</td></tr>
+        <tr><td>Crítico (20 natural)</td><td>Role todos os dados de dano duas vezes</td></tr>
+      </tbody></table>
+    </div>
+  </div>
+
+  <!-- XP -->
+  <div class="divider" id="xp-ref"><div class="divider-line"></div><div class="divider-title">⭐ XP &amp; Encontros</div><div class="divider-line"></div></div>
+
+  <div class="panel">
+    <div class="panel-header gold">⭐ XP por Nível</div>
+    <div class="panel-body">
+      <table><thead><tr><th>Nível</th><th>XP</th><th>Prof.</th></tr></thead><tbody>
+        <tr><td>1</td><td>0</td><td>+2</td></tr><tr><td>2</td><td>300</td><td>+2</td></tr><tr><td>3</td><td>900</td><td>+2</td></tr><tr><td>4</td><td>2.700</td><td>+2</td></tr>
+        <tr><td>5</td><td>6.500</td><td>+3</td></tr><tr><td>6</td><td>14.000</td><td>+3</td></tr><tr><td>7</td><td>23.000</td><td>+3</td></tr><tr><td>8</td><td>34.000</td><td>+3</td></tr>
+        <tr><td>9</td><td>48.000</td><td>+4</td></tr><tr><td>10</td><td>64.000</td><td>+4</td></tr><tr><td>11</td><td>85.000</td><td>+4</td></tr><tr><td>12</td><td>100.000</td><td>+4</td></tr>
+        <tr><td>13</td><td>120.000</td><td>+5</td></tr><tr><td>14</td><td>140.000</td><td>+5</td></tr><tr><td>15</td><td>165.000</td><td>+5</td></tr><tr><td>16</td><td>195.000</td><td>+5</td></tr>
+        <tr><td>17</td><td>225.000</td><td>+6</td></tr><tr><td>18</td><td>265.000</td><td>+6</td></tr><tr><td>19</td><td>305.000</td><td>+6</td></tr><tr><td>20</td><td>355.000</td><td>+6</td></tr>
+      </tbody></table>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-header gold">⚔ Encontros &amp; XP Monstros</div>
+    <div class="panel-body">
+      <table style="margin-bottom:.7rem"><thead><tr><th>Dificuldade</th><th>XP / Personagem (Nív.1)</th></tr></thead><tbody>
+        <tr><td style="color:#8aee8a">Fácil</td><td>25 XP</td></tr><tr><td style="color:var(--gold2)">Médio</td><td>50 XP</td></tr><tr><td style="color:#e07040">Difícil</td><td>75 XP</td></tr><tr><td style="color:var(--red2)">Mortal</td><td>100 XP</td></tr>
+      </tbody></table>
+      <div style="font-size:.7rem;color:var(--muted);letter-spacing:.08em;margin-bottom:.4rem">MULTIPLICADOR DE MONSTROS</div>
+      <div><span class="enc-badge"><strong>1</strong> ×1</span><span class="enc-badge"><strong>2</strong> ×1,5</span><span class="enc-badge"><strong>3–6</strong> ×2</span><span class="enc-badge"><strong>7–10</strong> ×2,5</span><span class="enc-badge"><strong>11–14</strong> ×3</span><span class="enc-badge"><strong>15+</strong> ×4</span></div>
+      <table style="margin-top:.7rem"><thead><tr><th>ND</th><th>XP</th><th>ND</th><th>XP</th></tr></thead><tbody>
+        <tr><td>0</td><td>10</td><td>6</td><td>2.300</td></tr><tr><td>1/8</td><td>25</td><td>7</td><td>2.900</td></tr><tr><td>1/4</td><td>50</td><td>8</td><td>3.900</td></tr><tr><td>1/2</td><td>100</td><td>9</td><td>5.000</td></tr><tr><td>1</td><td>200</td><td>10</td><td>5.900</td></tr><tr><td>2</td><td>450</td><td>12</td><td>8.400</td></tr><tr><td>3</td><td>700</td><td>15</td><td>13.000</td></tr><tr><td>4</td><td>1.100</td><td>17</td><td>18.000</td></tr><tr><td>5</td><td>1.800</td><td>20</td><td>25.000</td></tr>
+      </tbody></table>
+    </div>
+  </div>
+
+</div><!-- /screen -->
+</div><!-- /tab-referencia -->
+
+<!-- ══════════════════════════════════════════ -->
+<!-- TAB: COMBATE & TURNOS                     -->
+<!-- ══════════════════════════════════════════ -->
+<div class="tab-content" id="tab-combate">
+  <div class="tracker-wrap">
+
+    <!-- Header do tracker -->
+    <div class="tracker-header">
+      <div class="round-display">Rodada <span id="round-num">1</span></div>
+      <div id="current-name" style="font-style:italic;color:var(--text2);font-size:.88rem">— nenhum combate ativo —</div>
+      <div class="tracker-btns">
+        <button class="tbtn" onclick="Tracker.prev()">◀ Anterior</button>
+        <button class="tbtn primary" onclick="Tracker.next()">▶ Próximo Turno</button>
+        <button class="tbtn" onclick="openAddForm()">+ Adicionar</button>
+        <button class="tbtn danger" onclick="Tracker.reset()">↺ Resetar</button>
+      </div>
+    </div>
+
+    <!-- Formulário de adicionar combatente -->
+    <div class="add-form" id="add-form">
+      <h3>Adicionar Combatente</h3>
+      <div class="form-row">
+        <div class="form-group" style="flex:2">
+          <label>Nome</label>
+          <input class="form-input wide" id="f-name" placeholder="Ex: Aragorn, Orc Guerreiro" onkeydown="if(event.key==='Enter')addCombatant()">
+        </div>
+        <div class="form-group">
+          <label>Iniciativa</label>
+          <div style="display:flex;gap:.3rem">
+            <input class="form-input num" id="f-init" type="number" value="" placeholder="—">
+            <button class="tbtn" onclick="rollInitiative()" title="Rolar 1d20+mod">🎲</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>PV Máx.</label>
+          <input class="form-input num" id="f-hp" type="number" placeholder="Ex: 45">
+        </div>
+        <div class="form-group">
+          <label>CA</label>
+          <input class="form-input num" id="f-ac" type="number" placeholder="Ex: 15">
+        </div>
+        <div class="form-group">
+          <label>Mod. Init.</label>
+          <input class="form-input num" id="f-mod" type="number" placeholder="+0" value="0">
+        </div>
+        <div class="form-group">
+          <label>Tipo</label>
+          <select class="form-input" id="f-type">
+            <option value="player">🧙 Jogador</option>
+            <option value="monster">👾 Monstro</option>
+            <option value="npc">👤 NPC</option>
+          </select>
+        </div>
+        <div class="form-group" style="justify-content:flex-end;gap:.4rem;flex-direction:row">
+          <button class="tbtn primary" onclick="addCombatant()">Adicionar</button>
+          <button class="tbtn" onclick="closeAddForm()">Cancelar</button>
+        </div>
+      </div>
+      <!-- Quick-add from saved chars -->
+      <div id="quick-chars-area" style="margin-top:.8rem;border-top:1px solid var(--border);padding-top:.7rem;display:none">
+        <div style="font-size:.7rem;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:.4rem">Adicionar de fichas salvas</div>
+        <div class="quick-chars" id="quick-chars"></div>
+      </div>
+    </div>
+
+    <!-- Lista de combatentes -->
+    <div class="combatant-list" id="combatant-list">
+      <div class="tracker-empty">Nenhum combatente.<br>Clique em <strong>+ Adicionar</strong> para começar o combate.</div>
+    </div>
+  </div>
+
+  <!-- Modal de condições -->
+  <div class="modal-overlay" id="cond-modal">
+    <div class="modal">
+      <h3>Condições — <span id="cond-modal-name"></span></h3>
+      <div class="cond-grid" id="cond-grid"></div>
+      <button class="tbtn modal-close" onclick="closeCondModal()">Fechar</button>
+    </div>
+  </div>
+</div><!-- /tab-combate -->
+
+<!-- ══════════════════════════════════════════ -->
+<!-- TAB: FICHAS (Jogadores)                   -->
+<!-- ══════════════════════════════════════════ -->
+<div class="tab-content" id="tab-fichas">
+  <div class="fichas-layout">
+    <div class="fichas-panel">
+      <div class="fichas-panel-header gold">
+        <span>🧙 Jogadores</span>
+        <span id="ai-badge-area"></span>
+      </div>
+      <div class="fichas-panel-body">
+        <div class="char-cards" id="char-cards">
+          <div class="no-chars">Nenhuma ficha salva.<br><small>Use o painel ao lado para importar.</small></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="fichas-panel">
+      <div class="fichas-panel-header purple">✨ Importar Ficha de Jogador com IA</div>
+      <div class="fichas-panel-body">
+        <div class="upload-area" id="upload-area" onclick="document.getElementById('file-input').click()" ondragover="event.preventDefault();this.classList.add('drag')" ondragleave="this.classList.remove('drag')" ondrop="handleFileDrop(event)">
+          <div class="upload-icon">📄</div>
+          <div class="upload-text">Arraste uma foto/PDF da ficha ou clique para selecionar</div>
+          <div class="upload-sub">PNG, JPG, PDF — a IA vai ler e extrair os dados</div>
+        </div>
+        <input type="file" id="file-input" class="file-hidden" accept="image/*,.pdf" onchange="handleFileSelect(event)">
+        <div class="or-divider">ou cole o texto</div>
+        <textarea class="ai-textarea" id="sheet-text" placeholder="Cole aqui o texto da ficha, exportação do D&D Beyond, ou descreva o personagem..."></textarea>
+        <button class="ai-btn" id="parse-btn" onclick="parseSheet('jogador')">✨ Ler Ficha com IA</button>
+        <div class="ai-status" id="parse-status"></div>
+        <div class="parsed-preview" id="parsed-preview">
+          <div class="parsed-name" id="pp-name"></div>
+          <div class="parsed-sub" id="pp-sub"></div>
+          <div class="parsed-stats" id="pp-stats"></div>
+          <div class="parsed-actions">
+            <button class="tbtn primary" onclick="saveCurrentChar('jogador')">💾 Salvar Ficha</button>
+            <button class="tbtn" onclick="addCurrentCharToTracker()">⚔ Adicionar ao Combate</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><!-- /tab-fichas -->
+
+<!-- ══════════════════════════════════════════ -->
+<!-- TAB: NPCs                                 -->
+<!-- ══════════════════════════════════════════ -->
+<div class="tab-content" id="tab-npcs">
+  <div class="fichas-layout">
+    <div class="fichas-panel">
+      <div class="fichas-panel-header dark"><span>👥 NPCs da Campanha</span></div>
+      <div class="fichas-panel-body">
+        <div class="char-cards" id="npc-cards">
+          <div class="no-chars">Nenhum NPC salvo.<br><small>Gere ou importe NPCs pelo painel ao lado.</small></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="fichas-panel">
+      <div class="fichas-panel-header purple">🤖 Gerar NPC com IA</div>
+      <div class="fichas-panel-body">
+        <div class="notes-label">Descreva o NPC</div>
+        <textarea class="ai-textarea" id="npc-desc" placeholder="Ex: Um ferreiro anão idoso e mal-humorado que esconde um passado como aventureiro. Membro secreto de uma guilda de ladrões. Mora em Pedra Cinza." style="min-height:80px"></textarea>
+        <button class="ai-btn" id="npc-gen-btn" onclick="generateNPC()" style="margin-top:.5rem">🤖 Gerar NPC com IA</button>
+        <div class="ai-status" id="npc-gen-status"></div>
+
+        <div class="parsed-preview" id="npc-preview">
+          <div class="parsed-name" id="np-name"></div>
+          <div class="parsed-sub" id="np-sub"></div>
+          <div class="parsed-stats" id="np-stats"></div>
+          <div style="margin-top:.6rem;font-size:.8rem;color:var(--text2)" id="np-traits"></div>
+          <div class="parsed-actions" style="margin-top:.7rem">
+            <button class="tbtn primary" onclick="saveCurrentNPC()">💾 Salvar NPC</button>
+            <button class="tbtn" onclick="addCurrentNPCToTracker()">⚔ Adicionar ao Combate</button>
+          </div>
+        </div>
+
+        <div class="or-divider" style="margin-top:1rem">ou importe de arquivo</div>
+        <div class="upload-area" style="padding:1rem" onclick="document.getElementById('npc-file-input').click()">
+          <div class="upload-text">📄 Foto/PDF da ficha do NPC</div>
+        </div>
+        <input type="file" id="npc-file-input" class="file-hidden" accept="image/*,.pdf" onchange="handleNPCFileSelect(event)">
+        <textarea class="ai-textarea" id="npc-sheet-text" placeholder="Ou cole aqui o texto da ficha do NPC..." style="margin-top:.5rem;min-height:60px"></textarea>
+        <button class="ai-btn" onclick="parseNPCSheet()" style="background:linear-gradient(135deg,#1a3a6a,#0d1f3a);border-color:var(--blue2);color:#a0c0f5;margin-top:.4rem">✨ Ler Ficha de NPC</button>
+        <div class="ai-status" id="npc-parse-status"></div>
+      </div>
+    </div>
+  </div>
+</div><!-- /tab-npcs -->
+
+<!-- ══════════════════════════════════════════ -->
+<!-- TAB: SESSÕES                              -->
+<!-- ══════════════════════════════════════════ -->
+<div class="tab-content" id="tab-sessoes">
+  <div style="display:grid;grid-template-columns:280px 1fr;gap:1.2rem;padding:1.2rem;max-width:1400px;margin:0 auto">
+    <!-- Lista de sessões salvas -->
+    <div class="fichas-panel" style="height:fit-content;position:sticky;top:60px">
+      <div class="fichas-panel-header dark" style="justify-content:space-between">
+        <span>📚 Sessões Salvas</span>
+        <button class="tbtn" style="font-size:.72rem;padding:.2rem .5rem" onclick="newSession()">+ Nova</button>
+      </div>
+      <div class="fichas-panel-body" style="padding:.5rem">
+        <div id="sessions-list">
+          <div class="no-chars">Nenhuma sessão salva ainda.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Editor de sessão -->
+    <div>
+      <div class="fichas-panel">
+        <div class="fichas-panel-header green" style="justify-content:space-between">
+          <input id="sess-name" class="form-input" placeholder="Nome da sessão (ex: Sessão 1 — A Taverna Sombria)" style="flex:1;margin-right:.8rem;background:transparent;border-color:rgba(255,255,255,.1);font-size:.9rem">
+          <input id="sess-date" type="date" class="form-input" style="width:160px;font-size:.82rem">
+        </div>
+        <div class="fichas-panel-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+            <div>
+              <div class="notes-label" style="display:flex;justify-content:space-between;align-items:center">
+                <span>Anotações brutas</span>
+                <button class="ai-btn" id="org-btn" onclick="organizeNotes()" style="padding:.3rem .8rem;font-size:.78rem;margin:0;width:auto">✨ Organizar com IA</button>
+              </div>
+              <textarea class="notes-textarea" id="raw-notes" placeholder="Escreva suas anotações aqui — pode ser bagunçado, abreviado, qualquer coisa. A IA vai organizar tudo...&#10;&#10;Exemplos:&#10;- party chegou em pedra cinza&#10;- conheceram thorvald (ferreiro suspeito)&#10;- encontraram mapa rasgado no beco&#10;- luta com 3 bandidos, elara quase morreu" style="min-height:300px"></textarea>
+              <div class="ai-status" id="notes-status"></div>
+            </div>
+            <div>
+              <div class="notes-label" style="display:flex;justify-content:space-between;align-items:center">
+                <span>Anotações organizadas</span>
+                <button class="tbtn" style="font-size:.7rem;padding:.2rem .5rem" onclick="copyNotes()">📋 Copiar</button>
+              </div>
+              <div class="notes-output" id="notes-output" style="min-height:300px">As anotações organizadas aparecerão aqui...</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:.6rem;margin-top:.8rem;padding-top:.8rem;border-top:1px solid var(--border)">
+            <button class="tbtn primary" onclick="saveSession()">💾 Salvar Sessão</button>
+            <button class="tbtn danger" id="del-sess-btn" onclick="deleteCurrentSession()" style="display:none">🗑 Excluir</button>
+            <div class="ai-status" id="save-sess-status" style="margin-left:auto;align-self:center"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><!-- /tab-sessoes -->
+
+<!-- ══════════════════════════════════════════ -->
+<!-- TAB: FERRAMENTAS                          -->
+<!-- ══════════════════════════════════════════ -->
+<div class="tab-content" id="tab-ferramentas">
+  <div style="padding:1.2rem;max-width:1400px;margin:0 auto">
+  <div class="tools-grid">
+
+    <!-- DADOS VIRTUAL -->
+    <div class="tool-panel">
+      <div class="tool-header gold">🎲 Dados Virtual</div>
+      <div class="tool-body">
+        <div class="dice-quick">
+          <button class="die-btn" onclick="quickRoll(4)">d4</button>
+          <button class="die-btn" onclick="quickRoll(6)">d6</button>
+          <button class="die-btn" onclick="quickRoll(8)">d8</button>
+          <button class="die-btn" onclick="quickRoll(10)">d10</button>
+          <button class="die-btn" onclick="quickRoll(12)">d12</button>
+          <button class="die-btn d20" onclick="quickRoll(20)">d20</button>
+          <button class="die-btn" onclick="quickRoll(100)">d100</button>
+          <button class="die-btn" onclick="quickRoll(6,2,0,'Vantagem')" style="font-size:.72rem">2d20 Van.</button>
+          <button class="die-btn" onclick="rollDisadvantage()" style="font-size:.72rem">2d20 Des.</button>
+        </div>
+        <div class="dice-input-row">
+          <input class="dice-input" id="dice-notation" placeholder="Ex: 2d6+3 ou 4d8" onkeydown="if(event.key==='Enter')rollNotation()">
+          <button class="dice-roll-btn" onclick="rollNotation()">Rolar</button>
+        </div>
+        <div class="dice-result" id="dice-result">
+          <div style="color:var(--muted);font-size:.85rem">Clique em um dado para rolar</div>
+        </div>
+        <div class="dice-history" id="dice-history"></div>
+      </div>
+    </div>
+
+    <!-- GERADOR DE NOMES -->
+    <div class="tool-panel">
+      <div class="tool-header blue">📛 Gerador de Nomes</div>
+      <div class="tool-body">
+        <div class="name-race-grid" id="name-race-grid">
+          <button class="race-btn sel" onclick="selectRace(this,'humano')">Humano</button>
+          <button class="race-btn" onclick="selectRace(this,'elfo')">Elfo</button>
+          <button class="race-btn" onclick="selectRace(this,'anao')">Anão</button>
+          <button class="race-btn" onclick="selectRace(this,'halfling')">Halfling</button>
+          <button class="race-btn" onclick="selectRace(this,'orc')">Orc</button>
+          <button class="race-btn" onclick="selectRace(this,'tiefling')">Tiefling</button>
+          <button class="race-btn" onclick="selectRace(this,'draconato')">Draconato</button>
+          <button class="race-btn" onclick="selectRace(this,'gnomo')">Gnomo</button>
+        </div>
+        <div class="name-result" onclick="generateName()" title="Clique para gerar outro">
+          <div class="name-big" id="name-result">—</div>
+          <div class="name-sub" id="name-sub">Selecione uma raça e clique para gerar</div>
+        </div>
+        <div style="display:flex;gap:.5rem;margin-top:.6rem">
+          <button class="tbtn" style="flex:1" onclick="generateName()">♻ Novo Nome</button>
+          <button class="tbtn" onclick="generateName('m')">♂ Masc.</button>
+          <button class="tbtn" onclick="generateName('f')">♀ Fem.</button>
+        </div>
+        <div id="name-history" style="margin-top:.5rem;max-height:100px;overflow-y:auto"></div>
+      </div>
+    </div>
+
+    <!-- CLIMA ALEATÓRIO -->
+    <div class="tool-panel">
+      <div class="tool-header blue" style="background:linear-gradient(135deg,#0a1a3a,#06101f)">🌦 Clima &amp; Ambiente</div>
+      <div class="tool-body">
+        <div style="display:flex;gap:.5rem;margin-bottom:.7rem;flex-wrap:wrap">
+          <select id="weather-terrain" class="form-input" style="flex:1">
+            <option value="planicie">Planície</option>
+            <option value="floresta">Floresta</option>
+            <option value="montanha">Montanha</option>
+            <option value="deserto">Deserto</option>
+            <option value="costa">Costa / Mar</option>
+            <option value="pantano">Pântano</option>
+            <option value="artico">Ártico / Neve</option>
+          </select>
+          <select id="weather-season" class="form-input" style="width:110px">
+            <option value="primavera">Primavera</option>
+            <option value="verao">Verão</option>
+            <option value="outono">Outono</option>
+            <option value="inverno">Inverno</option>
+          </select>
+        </div>
+        <button class="tbtn primary" style="width:100%;margin-bottom:.7rem" onclick="generateWeather()">🌦 Gerar Clima</button>
+        <div class="weather-result" id="weather-result">
+          <div style="color:var(--muted);font-size:.85rem;text-align:center">Clique em Gerar Clima</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TESOURO ALEATÓRIO -->
+    <div class="tool-panel">
+      <div class="tool-header gold" style="background:linear-gradient(135deg,#3a2808,#251508)">💰 Tesouro Aleatório</div>
+      <div class="tool-body">
+        <div style="font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.4rem">CR do Encontro</div>
+        <div class="treasure-cr-row">
+          <button class="cr-btn sel" onclick="selectCR(this,'0-4')">CR 0–4</button>
+          <button class="cr-btn" onclick="selectCR(this,'5-10')">CR 5–10</button>
+          <button class="cr-btn" onclick="selectCR(this,'11-16')">CR 11–16</button>
+          <button class="cr-btn" onclick="selectCR(this,'17+')">CR 17+</button>
+        </div>
+        <button class="tbtn primary" style="width:100%;margin-bottom:.7rem" onclick="generateTreasure()">💰 Gerar Tesouro</button>
+        <div class="treasure-result" id="treasure-result">
+          <div style="color:var(--muted);font-size:.85rem;text-align:center">Selecione o CR e clique</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GERADOR DE ENCONTROS (gancho) -->
+    <div class="tool-panel">
+      <div class="tool-header red">⚔ Gancho de Encontro</div>
+      <div class="tool-body">
+        <div style="display:flex;gap:.5rem;margin-bottom:.7rem;flex-wrap:wrap">
+          <select id="enc-terrain" class="form-input" style="flex:1">
+            <option value="floresta">Floresta</option>
+            <option value="estrada">Estrada / Campo</option>
+            <option value="dungeon">Masmorra</option>
+            <option value="cidade">Cidade / Vila</option>
+            <option value="montanha">Montanha</option>
+            <option value="mar">Mar / Costa</option>
+            <option value="subterraneo">Subterrâneo</option>
+          </select>
+          <select id="enc-level" class="form-input" style="width:110px">
+            <option value="1-4">Nív. 1–4</option>
+            <option value="5-10">Nív. 5–10</option>
+            <option value="11-16">Nív. 11–16</option>
+            <option value="17+">Nív. 17+</option>
+          </select>
+        </div>
+        <button class="tbtn primary" style="width:100%;margin-bottom:.7rem" onclick="generateEncounter()">⚔ Gerar Encontro</button>
+        <div id="enc-result" style="background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:.8rem;min-height:3rem;font-size:.85rem;color:var(--text2);line-height:1.6">
+          <span style="color:var(--muted)">Clique para gerar um gancho de encontro.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CRONÔMETRO DE SESSÃO -->
+    <div class="tool-panel">
+      <div class="tool-header green">⏱ Cronômetro de Sessão</div>
+      <div class="tool-body" style="text-align:center">
+        <div id="timer-display" style="font-size:3rem;font-weight:700;color:var(--gold2);letter-spacing:.05em;margin:.5rem 0">00:00:00</div>
+        <div style="font-size:.75rem;color:var(--muted);margin-bottom:1rem" id="timer-status">Parado</div>
+        <div style="display:flex;gap:.5rem;justify-content:center;flex-wrap:wrap">
+          <button class="tbtn primary" id="timer-start-btn" onclick="timerToggle()">▶ Iniciar</button>
+          <button class="tbtn" onclick="timerReset()">↺ Resetar</button>
+          <button class="tbtn" onclick="timerLap()">🚩 Marcar</button>
+        </div>
+        <div id="timer-laps" style="margin-top:.7rem;max-height:100px;overflow-y:auto;text-align:left"></div>
+      </div>
+    </div>
+
+    <!-- GERADOR DE NARRAÇÃO -->
+    <div class="tool-panel" style="grid-column:1/-1">
+      <div class="tool-header purple">✨ Gerador de Narração</div>
+      <div class="tool-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:.6rem;margin-bottom:.7rem;flex-wrap:wrap" class="narr-controls">
+          <div>
+            <div style="font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.3rem">Tipo de Cena</div>
+            <select id="narr-type" class="form-input" style="width:100%">
+              <option value="combate">⚔ Combate / Ação</option>
+              <option value="exploracao">🗺 Exploração</option>
+              <option value="local">🏰 Descrição de Local</option>
+              <option value="dialogo">💬 Diálogo / Encontro Social</option>
+              <option value="viagem">🌅 Viagem / Transição</option>
+              <option value="climax">🌟 Clímax / Momento Épico</option>
+              <option value="morte">💀 Morte / Derrota</option>
+              <option value="vitoria">🏆 Vitória / Conquista</option>
+            </select>
+          </div>
+          <div>
+            <div style="font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.3rem">Tom</div>
+            <select id="narr-tone" class="form-input" style="width:100%">
+              <option value="epico">Épico</option>
+              <option value="sombrio">Sombrio</option>
+              <option value="tenso">Tenso</option>
+              <option value="misterioso">Misterioso</option>
+              <option value="melancolico">Melancólico</option>
+              <option value="comico">Cômico</option>
+              <option value="esperancoso">Esperançoso</option>
+            </select>
+          </div>
+          <div>
+            <div style="font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.3rem">Tamanho</div>
+            <select id="narr-length" class="form-input" style="width:100%">
+              <option value="curto">Curto (1-2 frases)</option>
+              <option value="medio" selected>Médio (parágrafo)</option>
+              <option value="longo">Longo (2-3 parágrafos)</option>
+            </select>
+          </div>
+          <div style="align-self:flex-end">
+            <button class="ai-btn" id="narr-btn" onclick="generateNarration()" style="margin:0;width:140px;padding:.45rem 1rem">✨ Narrar</button>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.8rem">
+          <div>
+            <div style="font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.3rem">Elementos da Cena <span style="font-weight:400;text-transform:none">(o que aconteceu, quem está envolvido, onde)</span></div>
+            <textarea class="ai-textarea" id="narr-scene" style="min-height:160px" placeholder="Ex: A party acabou de derrotar o Dragão Vermelho na Torre de Ardenfell. Elara, a paladina, está quase morta (2 PV). Thorin empunha a Espada Sagrada. O covil em chamas começa a desabar sobre eles.&#10;&#10;Ou mais simples:&#10;Party chega a uma cidade portuária escura, chuva, mau cheiro, dois capangas bloqueiam a entrada."></textarea>
+            <div class="ai-status" id="narr-status"></div>
+          </div>
+          <div>
+            <div style="font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.3rem;display:flex;justify-content:space-between;align-items:center">
+              <span>Narração Gerada</span>
+              <button class="tbtn" style="font-size:.68rem;padding:.15rem .4rem" onclick="copyNarration()">📋 Copiar</button>
+            </div>
+            <div id="narr-output" style="background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:.8rem 1rem;min-height:160px;font-size:.9rem;color:var(--text);line-height:1.8;font-style:italic;white-space:pre-wrap">A narração aparecerá aqui...</div>
+          </div>
+        </div>
+        <div style="margin-top:.5rem;display:flex;gap:.4rem;flex-wrap:wrap">
+          <span style="font-size:.7rem;color:var(--muted);align-self:center">Inspiração rápida:</span>
+          <button class="tbtn" style="font-size:.72rem;padding:.2rem .5rem" onclick="quickNarr('O primeiro atacante acerta um golpe crítico no inimigo')">⚔ Golpe crítico</button>
+          <button class="tbtn" style="font-size:.72rem;padding:.2rem .5rem" onclick="quickNarr('Um personagem cai a 0 PV durante o combate')">💀 Cai a 0 PV</button>
+          <button class="tbtn" style="font-size:.72rem;padding:.2rem .5rem" onclick="quickNarr('A party entra em uma masmorra antiga e assustadora')">🏚 Entra na dungeon</button>
+          <button class="tbtn" style="font-size:.72rem;padding:.2rem .5rem" onclick="quickNarr('O vilão principal revela seu plano e escapa')">😈 Vilão escapa</button>
+          <button class="tbtn" style="font-size:.72rem;padding:.2rem .5rem" onclick="quickNarr('A party derrota o boss final da campanha')">🏆 Boss derrotado</button>
+          <button class="tbtn" style="font-size:.72rem;padding:.2rem .5rem" onclick="quickNarr('Amanhecer após uma noite de acampamento na floresta perigosa')">🌅 Novo dia</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  </div>
+</div><!-- /tab-ferramentas -->
+
+<!-- Groq Key Modal -->
+<div class="modal-overlay" id="groq-key-modal" onclick="if(event.target===this)closeGroqModal(false)">
+  <div class="modal" style="max-width:440px">
+    <h3 style="font-size:.85rem;color:var(--purple2);letter-spacing:.08em;text-transform:uppercase;margin-bottom:.8rem">⚙ Configurar IA — Groq API</h3>
+    <p style="font-size:.82rem;color:var(--text2);margin-bottom:.7rem;line-height:1.5">Para usar recursos de IA neste modo estático, insira sua chave Groq gratuita. Ela fica salva <strong>somente no seu navegador</strong>.</p>
+    <div style="background:var(--bg3);border:1px solid var(--border2);border-radius:6px;padding:.6rem .8rem;margin-bottom:.8rem;font-size:.78rem;color:var(--text2)">
+      Obtenha uma chave gratuita em: <strong style="color:var(--gold2)">console.groq.com</strong>
+    </div>
+    <div style="margin-bottom:.8rem">
+      <label style="font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:.3rem">Chave API (gsk_...)</label>
+      <input id="groq-key-input" type="password" class="form-input" style="width:100%" placeholder="gsk_xxxxxxxxxxxxxxxxxxxx" onkeydown="if(event.key==='Enter')saveGroqKey()">
+    </div>
+    <div style="display:flex;gap:.5rem">
+      <button onclick="saveGroqKey()" class="tbtn primary" style="flex:1">✓ Salvar e Ativar</button>
+      <button onclick="clearGroqKey()" class="tbtn danger">🗑 Remover</button>
+      <button onclick="closeGroqModal(false)" class="tbtn">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- NPC Detail Modal -->
+<div class="modal-overlay" id="npc-detail-modal" onclick="if(event.target===this)closeNPCDetail()">
+  <div class="modal" style="max-width:580px;width:95vw;max-height:90vh;overflow-y:auto">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.8rem">
+      <h3 style="font-size:.85rem;color:var(--gold2);letter-spacing:.08em;text-transform:uppercase">Bloco de Estatísticas</h3>
+      <button onclick="closeNPCDetail()" style="background:none;border:none;color:var(--muted);font-size:1.2rem;cursor:pointer;line-height:1">✕</button>
+    </div>
+    <div id="npc-modal-content" class="stat-block"></div>
+  </div>
+</div>
+
+<footer>⚔ YoMaster.dnd — Escudo Digital do Mestre para D&D 5ª Edição ⚔</footer>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- SCRIPTS                                   -->
+<!-- ══════════════════════════════════════════ -->
+<script>
+// ─── MODO ESTÁTICO (GitHub Pages / hosting estático) ─────────────────────
+let isStatic = false;
+
+async function detectServerMode() {
+  try {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 1800);
+    const r = await fetch('/api/status', {signal: ctrl.signal});
+    clearTimeout(t);
+    if (!r.ok) throw new Error();
+    const d = await r.json();
+    if (!d.ok) throw new Error();
+    isStatic = false;
+  } catch {
+    isStatic = true;
+    activateStaticMode();
+  }
+}
+
+function activateStaticMode() {
+  const banner = document.getElementById('static-banner');
+  if (banner) banner.style.display = 'flex';
+  const orig = window.fetch.bind(window);
+  window.fetch = (url, opts = {}) => {
+    const s = String(url);
+    if (!s.startsWith('/api/')) return orig(url, opts);
+    return staticAPIHandler(s, opts, orig);
+  };
+}
+
+function jsonResp(data, status = 200) {
+  return new Response(JSON.stringify(data), {status, headers: {'Content-Type': 'application/json'}});
+}
+
+async function loadPdfJs() {
+  if (window.pdfjsLib) return;
+  await new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+    s.onload = res; s.onerror = () => rej(new Error('Falha ao carregar PDF.js'));
+    document.head.appendChild(s);
+  });
+  window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+}
+
+async function callGroqStatic(messages, system = '') {
+  let key = localStorage.getItem('ym_groq_key') || '';
+  if (!key) {
+    key = await openGroqKeyModal();
+    if (!key) throw new Error('Chave Groq não configurada. Clique em ⚙ Configurar Chave Groq.');
+  }
+  const gm = [];
+  if (system) gm.push({role: 'system', content: system});
+  for (const msg of messages) {
+    if (Array.isArray(msg.content)) {
+      gm.push({role: 'user', content: msg.content.map(p =>
+        p.type === 'image'
+          ? {type: 'image_url', image_url: {url: `data:${p.source.media_type};base64,${p.source.data}`}}
+          : {type: 'text', text: p.text || ''}
+      )});
+    } else {
+      gm.push({role: msg.role || 'user', content: msg.content});
+    }
+  }
+  const hasImg = gm.some(m => Array.isArray(m.content) && m.content.some(p => p.type === 'image_url'));
+  const model = hasImg ? 'llama-3.2-11b-vision-preview' : 'llama-3.3-70b-versatile';
+  const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key},
+    body: JSON.stringify({model, messages: gm, max_tokens: 4096, temperature: 0.3})
+  });
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({}));
+    if (resp.status === 401) { localStorage.removeItem('ym_groq_key'); throw new Error('Chave Groq inválida. Reconfigure em ⚙ Configurar Chave Groq.'); }
+    throw new Error('Groq: ' + (err.error?.message || resp.status));
+  }
+  const data = await resp.json();
+  return data.choices[0].message.content;
+}
+
+async function staticAPIHandler(url, opts, orig) {
+  const method = (opts.method || 'GET').toUpperCase();
+  let body = null;
+  try { if (opts.body) body = JSON.parse(opts.body); } catch {}
+
+  // Status
+  if (url === '/api/status') return jsonResp({ok: true, aiEnabled: !!localStorage.getItem('ym_groq_key'), isStatic: true});
+
+  // Characters
+  if (url === '/api/characters' && method === 'GET') return jsonResp(JSON.parse(localStorage.getItem('ym_chars') || '[]'));
+  if (url === '/api/characters' && method === 'POST') {
+    const chars = JSON.parse(localStorage.getItem('ym_chars') || '[]');
+    const saved = {id: String(Date.now()), ...body, savedAt: new Date().toISOString()};
+    chars.push(saved); localStorage.setItem('ym_chars', JSON.stringify(chars));
+    return jsonResp(saved, 201);
+  }
+  const cd = url.match(/^\/api\/characters\/([^/]+)$/);
+  if (cd && method === 'DELETE') {
+    localStorage.setItem('ym_chars', JSON.stringify(JSON.parse(localStorage.getItem('ym_chars') || '[]').filter(c => c.id !== cd[1])));
+    return jsonResp({ok: true});
+  }
+
+  // Sessions
+  if (url === '/api/sessions' && method === 'GET') return jsonResp(JSON.parse(localStorage.getItem('ym_sessions') || '[]'));
+  if (url === '/api/sessions' && method === 'POST') {
+    const {id: bid, ...sdata} = body;
+    const sessions = JSON.parse(localStorage.getItem('ym_sessions') || '[]');
+    const idx = bid ? sessions.findIndex(s => s.id === bid) : -1;
+    let rid;
+    if (idx >= 0) { sessions[idx] = {...sessions[idx], ...sdata, updatedAt: new Date().toISOString()}; rid = bid; }
+    else { rid = String(Date.now()); sessions.unshift({id: rid, ...sdata, createdAt: new Date().toISOString()}); }
+    localStorage.setItem('ym_sessions', JSON.stringify(sessions));
+    return jsonResp({ok: true, id: rid});
+  }
+  const sd = url.match(/^\/api\/sessions\/([^/]+)$/);
+  if (sd && method === 'DELETE') {
+    localStorage.setItem('ym_sessions', JSON.stringify(JSON.parse(localStorage.getItem('ym_sessions') || '[]').filter(s => s.id !== sd[1])));
+    return jsonResp({ok: true});
+  }
+
+  // PDF extraction via PDF.js
+  if (url === '/api/extract-pdf' && method === 'POST') {
+    try {
+      await loadPdfJs();
+      const bin = atob(body.pdfBase64);
+      const arr = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+      const pdf = await pdfjsLib.getDocument({data: arr}).promise;
+      let text = '';
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const pg = await pdf.getPage(i);
+        const ct = await pg.getTextContent();
+        text += ct.items.map(it => it.str).join(' ') + '\n';
+      }
+      if (!text.trim()) return jsonResp({ok: false, error: 'PDF sem texto legível. Tente uma foto da ficha.'}, 400);
+      return jsonResp({ok: true, text: text.trim()});
+    } catch (e) { return jsonResp({ok: false, error: e.message}, 500); }
+  }
+
+  // Parse sheet (AI)
+  if (url === '/api/parse-sheet' && method === 'POST') {
+    try {
+      const sys = `Você é especialista em D&D 5e. Extraia dados da ficha e responda APENAS com JSON válido (sem markdown):\n{"nome":"string","raca":"string","classe":"string","subclasse":"string|null","nivel":1,"pv":{"atual":10,"maximo":10},"ca":10,"iniciativa":0,"deslocamento":9,"for":10,"des":10,"con":10,"int":10,"sab":10,"car":10,"proficiencia":2,"pericias":[],"salvaguardas":[],"ataques":[{"nome":"Espada","bonus":"+3","dano":"1d8+1 cortante"}],"magias":{"atributo":"Int","cd":13,"bonus_ataque":5,"truques":[],"preparadas":[]},"equipamento":[],"tracos_raciais":[],"habilidades_classe":[],"notas":""}\nSe um campo não existir, use null ou lista vazia.`;
+      const msgs = body.imageBase64
+        ? [{role: 'user', content: [{type: 'image', source: {type: 'base64', media_type: body.imageMediaType || 'image/jpeg', data: body.imageBase64}}, {type: 'text', text: 'Extraia dados desta ficha D&D 5e em JSON.'}]}]
+        : [{role: 'user', content: `Ficha:\n\n${body.text}`}];
+      const raw = await callGroqStatic(msgs, sys);
+      const parsed = JSON.parse((raw.match(/\{[\s\S]*\}/) || [raw])[0]);
+      return jsonResp({ok: true, character: parsed});
+    } catch (e) { return jsonResp({ok: false, error: e.message}, 500); }
+  }
+
+  // Generate NPC (AI)
+  if (url === '/api/generate-npc' && method === 'POST') {
+    try {
+      const sys = `Você é especialista em D&D 5e. Crie um NPC completo com bloco de estatísticas detalhado. Responda APENAS com JSON válido, sem markdown:\n{"nome":"string","raca":"string","classe":"string ou null","papel":"Aliado|Inimigo|Neutro|Comerciante|Informante|Rival","ocupacao":"string","faccao":"string ou null","nivel_poder":"Fraco|Médio|Forte|Lendário","cr":"1","pv":{"atual":30,"maximo":30},"ca":13,"iniciativa":1,"deslocamento":"9m","for":10,"des":10,"con":10,"int":10,"sab":10,"car":10,"salvaguardas":[],"pericias":[],"percep_passiva":12,"resistencias":[],"imunidades":[],"sentidos":"Visão Comum","idiomas":"Comum","ataques":[{"nome":"Espada","tipo":"Corpo a Corpo","alcance":"1,5m","bonus":"+4","dano":"1d8+2 cortante","notas":""}],"magias":{"atributo":null,"cd":0,"bonus_ataque":0,"truques":[],"nivel_1":{"slots":0,"preparadas":[]},"nivel_2":{"slots":0,"preparadas":[]},"nivel_3":{"slots":0,"preparadas":[]},"nivel_4":{"slots":0,"preparadas":[]},"nivel_5":{"slots":0,"preparadas":[]}},"habilidades_especiais":[],"acoes_bonus":[],"reacoes":[],"equipamento":[],"personalidade":"string","ideal":"string","vinculo":"string","defeito":"string","localizacao":"string","notas_dm":"string"}\nPara casters preencha magias com feitiços reais do D&D 5e. Calibre stats pelo CR.`;
+      const raw = await callGroqStatic([{role: 'user', content: `Crie um NPC D&D 5e: ${body.description}`}], sys);
+      const npc = JSON.parse((raw.match(/\{[\s\S]*\}/) || [raw])[0]);
+      npc.tipo = 'npc';
+      return jsonResp({ok: true, npc});
+    } catch (e) { return jsonResp({ok: false, error: e.message}, 500); }
+  }
+
+  // Organize notes (AI)
+  if (url === '/api/organize-notes' && method === 'POST') {
+    try {
+      const {notes, characters = [], sessionName = ''} = body;
+      const sys = `Você é assistente de Mestre de D&D 5e. Organize as anotações em Markdown estruturado com: # Resumo, ## Eventos Principais, ## NPCs Encontrados, ## Locais, ## Recompensas e Itens, ## Ganchos e Próxima Sessão. Preserve todos os detalhes. Responda em português.`;
+      const charCtx = characters.length ? `Party: ${characters.map(c => `${c.nome} (${c.classe} Nív.${c.nivel})`).join(', ')}\n\n` : '';
+      const organized = await callGroqStatic([{role: 'user', content: `${sessionName ? `Sessão: ${sessionName}\n\n` : ''}${charCtx}Anotações brutas:\n\n${notes}`}], sys);
+      return jsonResp({ok: true, organized});
+    } catch (e) { return jsonResp({ok: false, error: e.message}, 500); }
+  }
+
+  // Generate narration (AI)
+  if (url === '/api/generate-narration' && method === 'POST') {
+    try {
+      const {scene, type = 'combate', tone = 'epico', length = 'medio', characters = []} = body;
+      const lm = {curto: 'Uma ou duas frases curtas e impactantes.', medio: 'Um parágrafo de 3 a 5 frases.', longo: 'Dois a três parágrafos ricos em detalhes sensoriais.'};
+      const tm = {epico: 'épico e grandioso', sombrio: 'sombrio e ameaçador', tenso: 'tenso e sufocante', misterioso: 'misterioso e intrigante', melancolico: 'melancólico e pesado', comico: 'cômico e leve', esperancoso: 'esperançoso e inspirador'};
+      const ym = {combate: 'cena de combate/ação', exploracao: 'cena de exploração', local: 'descrição de local', dialogo: 'encontro social/diálogo', viagem: 'viagem/transição narrativa', climax: 'clímax épico', morte: 'morte ou derrota dramática', vitoria: 'vitória e conquista'};
+      const sys = `Você é o Narrador de uma campanha de D&D 5e em português. Crie narrações imersivas e cinematográficas. Use presente do indicativo para ações. Seja específico, sensorial, evite clichês. Não quebre a quarta parede. Responda APENAS com o texto narrativo, sem introdução ou título.`;
+      const charCtx = characters.length ? `\nPersonagens: ${characters.join(', ')}.` : '';
+      const narration = await callGroqStatic([{role: 'user', content: `Cena: ${ym[type] || type}\nTom: ${tm[tone] || tone}\nTamanho: ${lm[length] || lm.medio}${charCtx}\n\nO que aconteceu:\n${scene}`}], sys);
+      return jsonResp({ok: true, narration});
+    } catch (e) { return jsonResp({ok: false, error: e.message}, 500); }
+  }
+
+  return jsonResp({error: 'Rota não encontrada'}, 404);
+}
+
+// ─── GROQ KEY MODAL ───────────────────────────
+function openGroqKeyModal() {
+  return new Promise(resolve => {
+    const modal = document.getElementById('groq-key-modal');
+    document.getElementById('groq-key-input').value = localStorage.getItem('ym_groq_key') || '';
+    modal.classList.add('open');
+    window._groqKeyResolve = resolve;
+  });
+}
+function saveGroqKey() {
+  const key = document.getElementById('groq-key-input').value.trim();
+  if (key) localStorage.setItem('ym_groq_key', key);
+  closeGroqModal(key);
+}
+function clearGroqKey() {
+  localStorage.removeItem('ym_groq_key');
+  document.getElementById('groq-key-input').value = '';
+  closeGroqModal('');
+}
+function closeGroqModal(key) {
+  document.getElementById('groq-key-modal').classList.remove('open');
+  checkAIStatus();
+  if (window._groqKeyResolve) { window._groqKeyResolve(key || ''); window._groqKeyResolve = null; }
+}
+function openGroqKeyConfig() { openGroqKeyModal().then(() => {}); }
+
+// ─── TAB SYSTEM ───────────────────────────────
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  if (btn) btn.classList.add('active');
+  else document.querySelectorAll('.tab-btn').forEach(b => { if (b.getAttribute('onclick')?.includes(`'${name}'`)) b.classList.add('active'); });
+  document.getElementById('ref-nav').style.display = name === 'referencia' ? 'flex' : 'none';
+}
+document.getElementById('ref-nav').style.display = 'flex';
+
+// ─── INITIATIVE TRACKER ───────────────────────
+const CONDITIONS_LIST = [
+  'Cego','Enfeitiçado','Surdo','Amedrontado','Agarrado','Incapacitado',
+  'Invisível','Paralisado','Petrificado','Envenenado','Prono','Contido',
+  'Atordoado','Inconsciente','Concentração','Exausto 1','Exausto 2','Exausto 3'
+];
+
+const Tracker = (() => {
+  let C = [], idx = 0, round = 1, condTargetId = null;
+
+  function save() {
+    try { localStorage.setItem('ym_tracker', JSON.stringify({C, idx, round})); } catch{}
+  }
+  function load() {
+    try {
+      const d = JSON.parse(localStorage.getItem('ym_tracker') || '{}');
+      C = d.C || []; idx = d.idx || 0; round = d.round || 1;
+    } catch{}
+    render();
+  }
+
+  function add(name, initiative, hp, ac, type) {
+    C.push({ id: Date.now(), name, initiative: +initiative||0, hp: +hp||0, maxHp: +hp||0, ac: +ac||0, type, conditions: [] });
+    C.sort((a,b) => b.initiative - a.initiative);
+    if (C.length === 1) idx = 0;
+    save(); render();
+  }
+
+  function remove(id) {
+    const i = C.findIndex(c => c.id === id);
+    if (i < idx) idx = Math.max(0, idx-1);
+    C = C.filter(c => c.id !== id);
+    if (idx >= C.length) idx = 0;
+    save(); render();
+  }
+
+  function next() {
+    if (!C.length) return;
+    idx = (idx+1) % C.length;
+    if (idx === 0) round++;
+    save(); render();
+  }
+
+  function prev() {
+    if (!C.length) return;
+    if (idx === 0) { round = Math.max(1,round-1); idx = C.length-1; }
+    else idx--;
+    save(); render();
+  }
+
+  function updateHP(id, delta) {
+    const c = C.find(c => c.id === id);
+    if (!c) return;
+    c.hp = Math.min(c.maxHp, Math.max(0, c.hp + delta));
+    save(); render();
+  }
+
+  function setHP(id, val) {
+    const c = C.find(c => c.id === id);
+    if (!c) return;
+    c.hp = Math.min(c.maxHp, Math.max(0, parseInt(val)||0));
+    save(); render();
+  }
+
+  function toggleCond(id, cond) {
+    const c = C.find(c => c.id === id);
+    if (!c) return;
+    const i = c.conditions.indexOf(cond);
+    if (i === -1) c.conditions.push(cond); else c.conditions.splice(i,1);
+    save(); renderCondModal(id);
+  }
+
+  function openCondModal(id) {
+    condTargetId = id;
+    const c = C.find(c => c.id === id);
+    if (!c) return;
+    renderCondModal(id);
+    document.getElementById('cond-modal-name').textContent = c.name;
+    document.getElementById('cond-modal').classList.add('open');
+  }
+
+  function renderCondModal(id) {
+    const c = C.find(c => c.id === id);
+    if (!c) return;
+    document.getElementById('cond-grid').innerHTML = CONDITIONS_LIST.map(cond =>
+      `<div class="cond-pick${c.conditions.includes(cond)?' selected':''}" onclick="Tracker.toggleCond(${id},'${cond}')">${cond}</div>`
+    ).join('');
+  }
+
+  function reset() {
+    if (!confirm('Resetar combate? Todos os combatentes serão removidos.')) return;
+    C = []; idx = 0; round = 1;
+    save(); render();
+  }
+
+  function hpColor(hp, max) {
+    if (!max) return '#666';
+    const p = hp/max;
+    if (p > .6) return 'var(--green2)';
+    if (p > .3) return 'var(--gold2)';
+    if (p > 0)  return 'var(--red2)';
+    return '#444';
+  }
+
+  function condClass(cond) {
+    if (['Invisível','Incapacitado','Concentração'].includes(cond)) return 'green';
+    if (['Agarrado','Prono','Contido'].includes(cond)) return 'blue';
+    return '';
+  }
+
+  function render() {
+    document.getElementById('round-num').textContent = round;
+    const cur = C[idx];
+    document.getElementById('current-name').textContent = cur
+      ? `Vez de: ${cur.name}` : '— nenhum combate ativo —';
+
+    const el = document.getElementById('combatant-list');
+    if (!C.length) {
+      el.innerHTML = '<div class="tracker-empty">Nenhum combatente.<br>Clique em <strong>+ Adicionar</strong> para começar o combate.</div>';
+      return;
+    }
+
+    el.innerHTML = C.map((c,i) => `
+      <div class="combatant${i===idx?' current':''}${c.hp===0?' dead':''}">
+        <div class="comb-init ${c.type}">${c.initiative}</div>
+        <div class="comb-info">
+          <div class="comb-name${i===idx?' current':''}">${c.name}</div>
+          <div class="comb-conds">
+            ${c.conditions.map(cd =>
+              `<span class="cond-badge ${condClass(cd)}" onclick="Tracker.toggleCond(${c.id},'${cd}')">${cd} ✕</span>`
+            ).join('')}
+          </div>
+        </div>
+        <div class="comb-hp-area">
+          <div class="hp-row">
+            <button class="hp-btn" onclick="Tracker.updateHP(${c.id},-1)" title="−1 PV">−</button>
+            <div class="hp-display" id="hpd-${c.id}" onclick="editHP(${c.id})" title="Clique para editar PV">
+              ${c.hp}/${c.maxHp}
+            </div>
+            <button class="hp-btn" onclick="Tracker.updateHP(${c.id},1)" title="+1 PV">+</button>
+          </div>
+          <div class="hp-bar-wrap">
+            <div class="hp-bar" style="width:${c.maxHp?Math.max(0,c.hp/c.maxHp*100):0}%;background:${hpColor(c.hp,c.maxHp)}"></div>
+          </div>
+          <div class="ac-badge">CA ${c.ac}</div>
+        </div>
+        <div class="comb-side-btns">
+          <button class="side-btn" onclick="Tracker.openCondModal(${c.id})" title="Condições">🩸</button>
+          <button class="side-btn del" onclick="Tracker.remove(${c.id})" title="Remover">🗑</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function getCombatants() { return C; }
+
+  return { add, remove, next, prev, updateHP, setHP, toggleCond, openCondModal, reset, load, getCombatants };
+})();
+
+function editHP(id) {
+  const el = document.getElementById('hpd-' + id);
+  if (!el) return;
+  const cur = el.textContent.trim().split('/')[0];
+  el.innerHTML = `<input type="number" value="${cur}" style="width:55px" autofocus onblur="commitHP(${id},this.value)" onkeydown="if(event.key==='Enter')this.blur()">`;
+  el.querySelector('input').focus();
+}
+function commitHP(id, val) { Tracker.setHP(id, val); }
+function closeCondModal() { document.getElementById('cond-modal').classList.remove('open'); }
+
+// Add form
+function openAddForm() {
+  document.getElementById('add-form').classList.add('open');
+  document.getElementById('f-name').focus();
+  renderQuickChars();
+}
+function closeAddForm() { document.getElementById('add-form').classList.remove('open'); }
+
+function rollInitiative() {
+  const mod = parseInt(document.getElementById('f-mod').value) || 0;
+  const roll = Math.floor(Math.random()*20)+1 + mod;
+  document.getElementById('f-init').value = roll;
+}
+
+function addCombatant() {
+  const name = document.getElementById('f-name').value.trim();
+  if (!name) { document.getElementById('f-name').focus(); return; }
+  const init = document.getElementById('f-init').value || Math.floor(Math.random()*20)+1;
+  const hp   = document.getElementById('f-hp').value || 10;
+  const ac   = document.getElementById('f-ac').value || 10;
+  const type = document.getElementById('f-type').value;
+  Tracker.add(name, init, hp, ac, type);
+  document.getElementById('f-name').value = '';
+  document.getElementById('f-init').value = '';
+  document.getElementById('f-hp').value = '';
+  document.getElementById('f-ac').value = '';
+  document.getElementById('f-name').focus();
+}
+
+function renderQuickChars() {
+  const chars = CharManager.getAll();
+  const area = document.getElementById('quick-chars-area');
+  const list = document.getElementById('quick-chars');
+  if (!chars.length) { area.style.display='none'; return; }
+  area.style.display='block';
+  list.innerHTML = chars.map(c =>
+    `<button class="quick-char-btn" onclick="addCharToTracker(${JSON.stringify(c).replace(/"/g,'&quot;')})">${c.nome || c.name} (Nív.${c.nivel||1})</button>`
+  ).join('');
+}
+
+function addCharToTracker(c) {
+  const initBonus = c.iniciativa || Math.floor(((c.des||10)-10)/2);
+  const roll = Math.floor(Math.random()*20)+1 + initBonus;
+  Tracker.add(c.nome || c.name, roll, (c.pv?.maximo || c.pv?.atual || 10), c.ca || 10, 'player');
+}
+
+// ─── CHARACTER MANAGER ────────────────────────
+const CharManager = (() => {
+  let chars = [];
+  let currentParsed = null;
+
+  async function loadFromServer() {
+    try { chars = await (await fetch('/api/characters')).json(); }
+    catch { chars = []; }
+    renderCards(); renderNPCCards(); renderQuickChars();
+  }
+
+  async function save(char) {
+    try {
+      const saved = await (await fetch('/api/characters', {
+        method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(char)
+      })).json();
+      chars.push(saved);
+      renderCards(); renderNPCCards(); renderQuickChars();
+      return saved;
+    } catch { return null; }
+  }
+
+  async function remove(id) {
+    try {
+      await fetch('/api/characters/'+id, { method:'DELETE' });
+      chars = chars.filter(c => c.id !== id);
+      renderCards(); renderNPCCards(); renderQuickChars();
+    } catch {}
+  }
+
+  function setCurrentParsed(char) { currentParsed = char; }
+  function getCurrentParsed() { return currentParsed; }
+  function getAll(tipo) { return tipo ? chars.filter(c => c.tipo === tipo) : chars; }
+
+  function classIcon(cls) {
+    const icons = {mago:'🧙',guerreiro:'⚔️',paladino:'⚡',druida:'🌿',clérigo:'✝️',bardo:'🎵',feiticeiro:'🔥',bruxo:'🌑',ranger:'🏹',ladino:'🗡️',bárbaro:'💪',monge:'👊'};
+    const k = (cls||'').toLowerCase();
+    for (const [n,i] of Object.entries(icons)) if (k.includes(n)) return i;
+    return '🧙';
+  }
+
+  function roleClass(papel) {
+    return (papel||'neutro').toLowerCase().replace(/\s/g,'').replace('é','e');
+  }
+
+  function renderCards() {
+    const el = document.getElementById('char-cards');
+    const jogadores = chars.filter(c => !c.tipo || c.tipo === 'jogador');
+    if (!jogadores.length) {
+      el.innerHTML = '<div class="no-chars">Nenhuma ficha salva.<br><small>Use o painel ao lado para importar.</small></div>';
+      return;
+    }
+    el.innerHTML = jogadores.map(c => {
+      const nome = c.nome||c.name||'Personagem';
+      const ini = c.iniciativa != null ? (c.iniciativa >= 0 ? '+'+c.iniciativa : c.iniciativa) : '?';
+      return `<div class="char-card">
+        <div class="char-card-top">
+          <div class="char-avatar">${classIcon(c.classe)}</div>
+          <div class="char-card-info">
+            <div class="char-card-name">${nome}</div>
+            <div class="char-card-sub">${c.raca||''} ${c.classe||''} · Nível ${c.nivel||1}</div>
+          </div>
+        </div>
+        <div class="char-card-stats">
+          <div class="char-stat">❤️ <strong>${c.pv?.maximo||0}</strong> PV</div>
+          <div class="char-stat">🛡 <strong>${c.ca||0}</strong> CA</div>
+          <div class="char-stat">🎲 <strong>${ini}</strong> Init</div>
+          ${c.for?`<div class="char-stat">💪 <strong>${c.for}</strong></div>`:''}
+          ${c.des?`<div class="char-stat">🏃 <strong>${c.des}</strong></div>`:''}
+          ${c.int?`<div class="char-stat">🧠 <strong>${c.int}</strong></div>`:''}
+        </div>
+        <div class="char-card-actions">
+          <button class="caction" onclick='addCharToTracker(${JSON.stringify(c).replace(/'/g,"&#39;")})'>⚔ Combate</button>
+          <button class="caction" onclick="showCharDetail('${c.id}')">📋 Detalhes</button>
+          <button class="caction del" onclick="CharManager.remove('${c.id}')">🗑</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function renderNPCCards() {
+    const el = document.getElementById('npc-cards');
+    if (!el) return;
+    const npcs = chars.filter(c => c.tipo === 'npc');
+    if (!npcs.length) {
+      el.innerHTML = '<div class="no-chars">Nenhum NPC salvo.<br><small>Gere ou importe NPCs pelo painel ao lado.</small></div>';
+      return;
+    }
+    el.innerHTML = npcs.map(c => {
+      const nome = c.nome||c.name||'NPC';
+      const rc = roleClass(c.papel);
+      return `<div class="char-card">
+        <div class="char-card-top">
+          <div class="char-avatar">👤</div>
+          <div class="char-card-info">
+            <div class="char-card-name">${nome} <span class="npc-role ${rc}">${c.papel||'Neutro'}</span></div>
+            <div class="char-card-sub">${c.raca||''} ${c.ocupacao||''} ${c.faccao?'· '+c.faccao:''}</div>
+          </div>
+        </div>
+        <div class="char-card-stats">
+          <div class="char-stat">❤️ <strong>${c.pv?.maximo||0}</strong> PV</div>
+          <div class="char-stat">🛡 <strong>${c.ca||0}</strong> CA</div>
+          <div class="char-stat">⚡ <strong>${c.nivel_poder||'?'}</strong></div>
+          ${c.localizacao?`<div class="char-stat" style="width:100%">📍 ${c.localizacao}</div>`:''}
+        </div>
+        ${c.personalidade?`<div style="font-size:.75rem;color:var(--text2);margin:.4rem 0;font-style:italic;border-top:1px solid var(--border);padding-top:.4rem">"${c.personalidade}"</div>`:''}
+        <div class="char-card-actions">
+          <button class="caction" onclick='addCharToTracker(${JSON.stringify(c).replace(/'/g,"&#39;")})'>⚔ Combate</button>
+          <button class="caction" onclick="showNPCDetail('${c.id}')">📋 Detalhes</button>
+          <button class="caction del" onclick="CharManager.remove('${c.id}')">🗑</button>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  function showCharDetail(id) {
+    const c = chars.find(x => x.id === id);
+    if (!c) return;
+    const nome = c.nome||c.name||'Personagem';
+    alert(`${nome} — ${c.raca} ${c.classe} Nível ${c.nivel}\n\nPV: ${c.pv?.maximo} | CA: ${c.ca} | Init: ${c.iniciativa}\n\nFOR ${c.for} | DES ${c.des} | CON ${c.con} | INT ${c.int} | SAB ${c.sab} | CAR ${c.car}\n\nProficiências: ${(c.pericias||[]).join(', ')}\n\nNotas: ${c.notas||'—'}`);
+  }
+
+  function showNPCDetail(id) {
+    const c = chars.find(x => x.id === id);
+    if (!c) return;
+    const mod = v => { const m = Math.floor((v-10)/2); return (m>=0?'+':'')+m; };
+    let html = `<div class="sb-name">${c.nome||'NPC'}</div>`;
+    const papel = c.papel||'Neutro'; const rc = roleClass(papel);
+    html += `<div class="sb-sub"><span class="npc-role ${rc}">${papel}</span> ${c.raca||''} ${c.classe?'· '+c.classe:''} ${c.ocupacao?'— '+c.ocupacao:''} ${c.faccao?'('+c.faccao+')':''}</div>`;
+    html += `<hr class="sb-divider">`;
+    html += `<div class="sb-line"><strong>PV</strong> ${c.pv?.maximo||'?'} &nbsp;&nbsp; <strong>CA</strong> ${c.ca||'?'} &nbsp;&nbsp; <strong>Iniciativa</strong> ${c.iniciativa>=0?'+':''}${c.iniciativa||0} &nbsp;&nbsp; <strong>Desl.</strong> ${c.deslocamento||'9m'}</div>`;
+    if (c.cr) html += `<div class="sb-line"><strong>CR</strong> ${c.cr} &nbsp;&nbsp; <strong>Poder</strong> ${c.nivel_poder||'?'}</div>`;
+    html += `<hr class="sb-divider">`;
+    html += `<div class="sb-attrs">`;
+    for (const [abbr,key] of [['FOR','for'],['DES','des'],['CON','con'],['INT','int'],['SAB','sab'],['CAR','car']]) {
+      html += `<div><div class="sb-attr-name">${abbr}</div><div class="sb-attr-val">${c[key]||10}</div><div class="sb-attr-mod">${mod(c[key]||10)}</div></div>`;
+    }
+    html += '</div>';
+    if (c.salvaguardas?.length) html += `<div class="sb-line"><strong>Salvaguardas</strong> ${c.salvaguardas.join(', ')}</div>`;
+    if (c.pericias?.length) html += `<div class="sb-line"><strong>Perícias</strong> ${c.pericias.join(', ')}</div>`;
+    if (c.resistencias?.length) html += `<div class="sb-line"><strong>Resistências</strong> ${c.resistencias.join(', ')}</div>`;
+    if (c.imunidades?.length) html += `<div class="sb-line"><strong>Imunidades</strong> ${c.imunidades.join(', ')}</div>`;
+    if (c.sentidos) html += `<div class="sb-line"><strong>Sentidos</strong> ${c.sentidos} · Percepção Passiva ${c.percep_passiva||10}</div>`;
+    if (c.idiomas) html += `<div class="sb-line"><strong>Idiomas</strong> ${c.idiomas}</div>`;
+    if (c.ataques?.length) {
+      html += `<div class="sb-section"><div class="sb-section-title">Ações</div>`;
+      html += c.ataques.map(a=>`<div class="sb-action"><span class="sb-action-name">${a.nome}.</span> ${a.tipo||''} (${a.alcance||'1,5m'}): acerto <span style="color:var(--gold2)">${a.bonus}</span>, dano <span style="color:var(--red2)">${a.dano}</span>${a.notas?' · '+a.notas:''}</div>`).join('');
+      html += '</div>';
+    }
+    if (c.acoes_bonus?.length) {
+      html += `<div class="sb-section"><div class="sb-section-title">Ações Bônus</div>`;
+      html += c.acoes_bonus.map(a=>`<div class="sb-action"><span class="sb-action-name">${a.nome}.</span> ${a.descricao}</div>`).join('');
+      html += '</div>';
+    }
+    if (c.reacoes?.length) {
+      html += `<div class="sb-section"><div class="sb-section-title">Reações</div>`;
+      html += c.reacoes.map(a=>`<div class="sb-action"><span class="sb-action-name">${a.nome}.</span> ${a.descricao}</div>`).join('');
+      html += '</div>';
+    }
+    if (c.habilidades_especiais?.length) {
+      html += `<div class="sb-section"><div class="sb-section-title">Habilidades Especiais</div>`;
+      html += c.habilidades_especiais.map(h=>`<div class="sb-action"><span class="sb-action-name">${h.nome}.</span> ${h.descricao}</div>`).join('');
+      html += '</div>';
+    }
+    if (c.magias?.atributo) {
+      html += `<div class="sb-section"><div class="sb-section-title">Conjuração (${c.magias.atributo} · CD ${c.magias.cd} · Ataque +${c.magias.bonus_ataque})</div>`;
+      if (c.magias.truques?.length) html += `<div class="sb-spell-level"><strong>Truques:</strong> ${c.magias.truques.join(', ')}</div>`;
+      for (let i=1;i<=5;i++) { const lvl=c.magias[`nivel_${i}`]; if (lvl?.preparadas?.length) html += `<div class="sb-spell-level"><strong>Nível ${i}</strong> (${lvl.slots} espaço${lvl.slots!==1?'s':''}): ${lvl.preparadas.join(', ')}</div>`; }
+      html += '</div>';
+    }
+    if (c.equipamento?.length) html += `<div class="sb-section"><div class="sb-section-title">Equipamento</div><div style="font-size:.82rem;color:var(--text2)">${c.equipamento.join(' · ')}</div></div>`;
+    html += `<hr class="sb-divider">`;
+    if (c.personalidade) html += `<div class="sb-line"><strong>🎭 Personalidade</strong> ${c.personalidade}</div>`;
+    if (c.ideal) html += `<div class="sb-line"><strong>💎 Ideal</strong> ${c.ideal}</div>`;
+    if (c.vinculo) html += `<div class="sb-line"><strong>🔗 Vínculo</strong> ${c.vinculo}</div>`;
+    if (c.defeito) html += `<div class="sb-line"><strong>⚠️ Defeito</strong> ${c.defeito}</div>`;
+    if (c.localizacao) html += `<div class="sb-line"><strong>📍 Local</strong> ${c.localizacao}</div>`;
+    if (c.notas_dm) html += `<div class="sb-section"><div class="sb-section-title">Notas do Mestre</div><div style="font-size:.82rem;color:var(--text2);font-style:italic">${c.notas_dm}</div></div>`;
+    document.getElementById('npc-modal-content').innerHTML = html;
+    document.getElementById('npc-detail-modal').classList.add('open');
+  }
+
+  return { loadFromServer, save, remove, setCurrentParsed, getCurrentParsed, getAll, renderCards, renderNPCCards };
+})();
+
+// ─── SESSION MANAGER ──────────────────────────
+const SessionManager = (() => {
+  let sessions = [];
+  let currentId = null;
+
+  async function load() {
+    try { sessions = await (await fetch('/api/sessions')).json(); }
+    catch { sessions = []; }
+    renderList();
+  }
+
+  async function save(data) {
+    const body = currentId ? { id: currentId, ...data } : data;
+    const resp = await fetch('/api/sessions', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(body)
+    });
+    const result = await resp.json();
+    if (result.id) currentId = result.id;
+    document.getElementById('del-sess-btn').style.display = 'inline-flex';
+    await load();
+  }
+
+  async function del(id) {
+    if (!confirm('Excluir esta sessão?')) return;
+    await fetch('/api/sessions/'+id, { method:'DELETE' });
+    if (currentId === id) { currentId = null; newSession(); }
+    await load();
+  }
+
+  function newSession() {
+    currentId = null;
+    document.getElementById('sess-name').value = '';
+    document.getElementById('sess-date').value = new Date().toISOString().split('T')[0];
+    document.getElementById('raw-notes').value = '';
+    document.getElementById('notes-output').textContent = 'As anotações organizadas aparecerão aqui...';
+    document.getElementById('del-sess-btn').style.display = 'none';
+    document.getElementById('save-sess-status').textContent = '';
+    renderList();
+  }
+
+  function open(id) {
+    const s = sessions.find(x => x.id === id);
+    if (!s) return;
+    currentId = id;
+    document.getElementById('sess-name').value = s.nome || '';
+    document.getElementById('sess-date').value = s.data || '';
+    document.getElementById('raw-notes').value = s.notas_brutas || '';
+    document.getElementById('notes-output').innerHTML = s.notas_organizadas ? markdownToHtml(s.notas_organizadas) : 'As anotações organizadas aparecerão aqui...';
+    document.getElementById('del-sess-btn').style.display = 'inline-flex';
+    renderList();
+  }
+
+  function renderList() {
+    const el = document.getElementById('sessions-list');
+    if (!sessions.length) {
+      el.innerHTML = '<div class="no-chars">Nenhuma sessão salva ainda.</div>';
+      return;
+    }
+    el.innerHTML = sessions.map(s => `
+      <div class="session-item${s.id===currentId?' active':''}" onclick="SessionManager.open('${s.id}')">
+        <div class="session-item-name">${s.nome||'Sessão sem nome'}</div>
+        <div class="session-item-date">${s.data||''}</div>
+        <div class="session-item-preview">${(s.notas_brutas||'').slice(0,60)}...</div>
+      </div>
+    `).join('');
+  }
+
+  function getCurrentId() { return currentId; }
+
+  return { load, save, del, newSession, open, renderList, getCurrentId };
+})();
+
+// ─── AI: GERAR NPC ────────────────────────────
+let currentNPC = null;
+
+async function generateNPC() {
+  const desc = document.getElementById('npc-desc').value.trim();
+  if (!desc) return;
+  const btn = document.getElementById('npc-gen-btn');
+  const status = document.getElementById('npc-gen-status');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Gerando NPC...';
+  status.textContent = 'IA criando o NPC...'; status.className = 'ai-status';
+  try {
+    const r = await fetch('/api/generate-npc', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ description: desc })
+    });
+    const d = await r.json();
+    if (!d.ok) throw new Error(d.error);
+    currentNPC = d.npc;
+    showNPCPreview(d.npc);
+    status.textContent = '✓ NPC gerado!'; status.className = 'ai-status ok';
+  } catch(e) {
+    status.textContent = 'Erro: '+e.message; status.className = 'ai-status error';
+  } finally {
+    btn.disabled = false; btn.innerHTML = '🤖 Gerar NPC com IA';
+  }
+}
+
+function showNPCPreview(c) {
+  const el = document.getElementById('npc-preview');
+  el.classList.add('open');
+  document.getElementById('np-name').textContent = c.nome||'NPC';
+  const papel = c.papel||'Neutro';
+  const rc = roleClass(papel);
+  document.getElementById('np-sub').innerHTML = `<span class="npc-role ${rc}">${papel}</span> ${c.raca||''} ${c.classe?'· '+c.classe:''} ${c.ocupacao?'— '+c.ocupacao:''} ${c.cr?'· CR '+c.cr:''}`.trim();
+  const stats = [];
+  if (c.pv?.maximo) stats.push(`❤️ ${c.pv.maximo} PV`);
+  if (c.ca) stats.push(`🛡 ${c.ca} CA`);
+  if (c.iniciativa != null) stats.push(`🎲 ${c.iniciativa>=0?'+':''}${c.iniciativa} Init`);
+  if (c.for) stats.push(`FOR ${c.for}`); if (c.des) stats.push(`DES ${c.des}`);
+  if (c.con) stats.push(`CON ${c.con}`); if (c.int) stats.push(`INT ${c.int}`);
+  if (c.sab) stats.push(`SAB ${c.sab}`); if (c.car) stats.push(`CAR ${c.car}`);
+  document.getElementById('np-stats').innerHTML = stats.map(s=>`<span class="pstat">${s}</span>`).join('');
+
+  let html = '';
+  if (c.ataques?.length) {
+    html += `<div style="margin-top:.5rem"><div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--gold);margin-bottom:.2rem">Ataques</div>`;
+    html += c.ataques.map(a=>`<div style="font-size:.78rem;color:var(--text2);padding:.1rem 0">⚔ <strong style="color:var(--text)">${a.nome}</strong> · ${a.tipo||''} · <span style="color:var(--gold2)">${a.bonus}</span> · ${a.dano}${a.notas?' <em>('+a.notas+')</em>':''}</div>`).join('');
+    html += '</div>';
+  }
+  if (c.magias?.atributo) {
+    html += `<div style="margin-top:.5rem"><div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--purple2);margin-bottom:.2rem">Magias (${c.magias.atributo} · CD ${c.magias.cd} · Ataque +${c.magias.bonus_ataque})</div>`;
+    if (c.magias.truques?.length) html += `<div style="font-size:.76rem;color:var(--text2)">Truques: ${c.magias.truques.join(', ')}</div>`;
+    for (let i=1;i<=5;i++) { const lvl=c.magias[`nivel_${i}`]; if (lvl?.preparadas?.length) html += `<div style="font-size:.76rem;color:var(--text2)">Nível ${i} (${lvl.slots}): ${lvl.preparadas.join(', ')}</div>`; }
+    html += '</div>';
+  }
+  if (c.habilidades_especiais?.length) {
+    html += `<div style="margin-top:.5rem"><div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--blue2);margin-bottom:.2rem">Habilidades Especiais</div>`;
+    html += c.habilidades_especiais.map(h=>`<div style="font-size:.76rem;color:var(--text2);margin:.1rem 0"><strong style="color:var(--text)">${h.nome}.</strong> ${h.descricao}</div>`).join('');
+    html += '</div>';
+  }
+  if (c.personalidade) html += `<div style="margin-top:.5rem;font-size:.76rem;color:var(--text2);font-style:italic;border-top:1px solid var(--border);padding-top:.4rem">"${c.personalidade}"</div>`;
+  if (c.localizacao) html += `<div style="font-size:.76rem;color:var(--muted);margin-top:.2rem">📍 ${c.localizacao}</div>`;
+  document.getElementById('np-traits').innerHTML = html;
+}
+
+async function saveCurrentNPC() {
+  const c = currentNPC;
+  if (!c) return;
+  c.tipo = 'npc';
+  const saved = await CharManager.save(c);
+  if (saved) {
+    document.getElementById('npc-gen-status').textContent = '✓ NPC salvo!';
+    document.getElementById('npc-gen-status').className = 'ai-status ok';
+    setTimeout(() => document.getElementById('npc-gen-status').textContent = '', 3000);
+  }
+}
+
+function addCurrentNPCToTracker() {
+  if (!currentNPC) return;
+  addCharToTracker(currentNPC);
+  switchTab('combate');
+}
+
+async function parseNPCSheet() {
+  const text = document.getElementById('npc-sheet-text').value.trim();
+  const fileInput = document.getElementById('npc-file-input');
+  const status = document.getElementById('npc-parse-status');
+  if (!text && !fileInput.files.length) { status.textContent = 'Cole o texto ou selecione um arquivo.'; return; }
+  status.textContent = 'Lendo ficha do NPC...'; status.className = 'ai-status';
+  try {
+    let body = {};
+    if (fileInput.files.length) {
+      const file = fileInput.files[0];
+      if (file.type === 'application/pdf') {
+        const b64 = await fileToBase64(file);
+        const r = await fetch('/api/extract-pdf', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ pdfBase64: b64.split(',')[1] }) });
+        const d = await r.json();
+        if (!d.ok) throw new Error(d.error);
+        body = { text: d.text };
+      } else {
+        const b64 = await fileToBase64(file);
+        body = { imageBase64: b64.split(',')[1], imageMediaType: file.type };
+      }
+    } else { body = { text }; }
+    const r = await fetch('/api/parse-sheet', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+    const d = await r.json();
+    if (!d.ok) throw new Error(d.error);
+    currentNPC = { ...d.character, tipo: 'npc' };
+    showNPCPreview(currentNPC);
+    status.textContent = '✓ Ficha do NPC lida!'; status.className = 'ai-status ok';
+  } catch(e) { status.textContent = 'Erro: '+e.message; status.className = 'ai-status error'; }
+}
+
+function handleNPCFileSelect(e) {
+  const file = e.target.files[0];
+  if (file) document.getElementById('npc-parse-status').textContent = '📎 ' + file.name;
+}
+
+// ─── AI: PARSE SHEET ──────────────────────────
+let currentParsed = null;
+
+async function parseSheet(tipo) {
+  const btn = document.getElementById('parse-btn');
+  const status = document.getElementById('parse-status');
+  const text = document.getElementById('sheet-text').value.trim();
+  const fileInput = document.getElementById('file-input');
+
+  if (!text && !fileInput.files.length) {
+    status.textContent = 'Cole o texto da ficha ou selecione um arquivo.';
+    status.className = 'ai-status error';
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Lendo ficha...';
+  status.textContent = 'Enviando para IA...';
+  status.className = 'ai-status';
+
+  try {
+    let body = {};
+
+    if (fileInput.files.length) {
+      const file = fileInput.files[0];
+      if (file.type === 'application/pdf') {
+        status.textContent = 'Extraindo texto do PDF...';
+        const b64 = await fileToBase64(file);
+        const pdfResp = await fetch('/api/extract-pdf', {
+          method: 'POST', headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ pdfBase64: b64.split(',')[1] })
+        });
+        const pdfData = await pdfResp.json();
+        if (!pdfData.ok) throw new Error(pdfData.error);
+        body = { text: pdfData.text };
+      } else {
+        status.textContent = 'Lendo imagem...';
+        const b64 = await fileToBase64(file);
+        body = { imageBase64: b64.split(',')[1], imageMediaType: file.type };
+      }
+    } else {
+      body = { text };
+    }
+
+    status.textContent = 'IA analisando a ficha...';
+    const resp = await fetch('/api/parse-sheet', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify(body)
+    });
+    const data = await resp.json();
+
+    if (!data.ok) throw new Error(data.error || 'Erro desconhecido');
+
+    currentParsed = data.character;
+    CharManager.setCurrentParsed(data.character);
+    showParsedPreview(data.character);
+    status.textContent = '✓ Ficha lida com sucesso!';
+    status.className = 'ai-status ok';
+  } catch(e) {
+    status.textContent = 'Erro: ' + e.message;
+    status.className = 'ai-status error';
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '✨ Ler Ficha com IA';
+  }
+}
+
+function showParsedPreview(c) {
+  const el = document.getElementById('parsed-preview');
+  el.classList.add('open');
+  document.getElementById('pp-name').textContent = c.nome || c.name || 'Personagem';
+  document.getElementById('pp-sub').textContent =
+    `${c.raca||''} ${c.classe||''} ${c.subclasse?'('+c.subclasse+')':''} · Nível ${c.nivel||1}`.trim();
+
+  const stats = [];
+  if (c.pv?.maximo) stats.push(`❤️ ${c.pv.maximo} PV`);
+  if (c.ca) stats.push(`🛡 ${c.ca} CA`);
+  if (c.iniciativa != null) stats.push(`🎲 ${c.iniciativa>=0?'+':''}${c.iniciativa} Init`);
+  if (c.for) stats.push(`FOR ${c.for}`);
+  if (c.des) stats.push(`DES ${c.des}`);
+  if (c.con) stats.push(`CON ${c.con}`);
+  if (c.int) stats.push(`INT ${c.int}`);
+  if (c.sab) stats.push(`SAB ${c.sab}`);
+  if (c.car) stats.push(`CAR ${c.car}`);
+
+  document.getElementById('pp-stats').innerHTML = stats.map(s =>
+    `<span class="pstat">${s}</span>`
+  ).join('');
+}
+
+async function saveCurrentChar(tipo) {
+  const c = currentParsed || CharManager.getCurrentParsed();
+  if (!c) return;
+  c.tipo = tipo || 'jogador';
+  const saved = await CharManager.save(c);
+  if (saved) {
+    document.getElementById('parse-status').textContent = '✓ Ficha salva!';
+    document.getElementById('parse-status').className = 'ai-status ok';
+    setTimeout(() => document.getElementById('parse-status').textContent = '', 3000);
+  }
+}
+
+function addCurrentCharToTracker() {
+  const c = currentParsed || CharManager.getCurrentParsed();
+  if (!c) return;
+  addCharToTracker(c);
+  switchTab('combate', null);
+  document.querySelector('[onclick*="\'combate\'"]').classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    if (b.getAttribute('onclick')?.includes('combate')) b.classList.add('active');
+    else b.classList.remove('active');
+  });
+}
+
+// ─── SESSÕES ──────────────────────────────────
+async function organizeNotes() {
+  const btn = document.getElementById('org-btn');
+  const status = document.getElementById('notes-status');
+  const notes = document.getElementById('raw-notes').value.trim();
+  if (!notes) { status.textContent = 'Digite as anotações primeiro.'; status.className='ai-status error'; return; }
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>';
+  status.textContent = 'IA organizando...'; status.className = 'ai-status';
+  try {
+    const r = await fetch('/api/organize-notes', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ notes, sessionName: document.getElementById('sess-name').value, characters: CharManager.getAll('jogador') })
+    });
+    const d = await r.json();
+    if (!d.ok) throw new Error(d.error);
+    document.getElementById('notes-output').innerHTML = markdownToHtml(d.organized);
+    status.textContent = '✓ Organizado!'; status.className = 'ai-status ok';
+  } catch(e) {
+    status.textContent = 'Erro: '+e.message; status.className = 'ai-status error';
+  } finally {
+    btn.disabled = false; btn.innerHTML = '✨ Organizar com IA';
+  }
+}
+
+async function saveSession() {
+  const status = document.getElementById('save-sess-status');
+  const nome = document.getElementById('sess-name').value.trim() || 'Sessão sem nome';
+  const data = document.getElementById('sess-date').value;
+  const notas_brutas = document.getElementById('raw-notes').value;
+  const raw = document.getElementById('notes-output').innerText;
+  const notas_organizadas = raw === 'As anotações organizadas aparecerão aqui...' ? '' : raw;
+  status.textContent = 'Salvando...'; status.className = 'ai-status';
+  try {
+    await SessionManager.save({ nome, data, notas_brutas, notas_organizadas });
+    status.textContent = '✓ Sessão salva!'; status.className = 'ai-status ok';
+    document.getElementById('del-sess-btn').style.display = 'inline-flex';
+    setTimeout(() => status.textContent = '', 3000);
+  } catch(e) { status.textContent = 'Erro: '+e.message; status.className = 'ai-status error'; }
+}
+
+function deleteCurrentSession() { SessionManager.del(SessionManager.getCurrentId()); }
+function newSession() { SessionManager.newSession(); }
+
+function copyNotes() {
+  const text = document.getElementById('notes-output').innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = event.target;
+    btn.textContent = '✓ Copiado!';
+    setTimeout(() => btn.textContent = '📋 Copiar', 2000);
+  });
+}
+
+// ─── FILE UTILS ───────────────────────────────
+function fileToBase64(file) {
+  return new Promise((res,rej) => {
+    const reader = new FileReader();
+    reader.onload = e => res(e.target.result);
+    reader.onerror = rej;
+    reader.readAsDataURL(file);
+  });
+}
+
+
+function handleFileSelect(event) {
+  const file = event.target.files[0];
+  if (file) {
+    document.getElementById('upload-area').querySelector('.upload-text').textContent = '📎 ' + file.name;
+    document.getElementById('parse-status').textContent = '';
+    document.getElementById('parsed-preview').classList.remove('open');
+  }
+}
+
+function handleFileDrop(event) {
+  event.preventDefault();
+  document.getElementById('upload-area').classList.remove('drag');
+  const file = event.dataTransfer.files[0];
+  if (file) {
+    document.getElementById('file-input').files = event.dataTransfer.files;
+    document.getElementById('upload-area').querySelector('.upload-text').textContent = '📎 ' + file.name;
+  }
+}
+
+// ─── MARKDOWN PARSER (simples) ────────────────
+function markdownToHtml(md) {
+  return md
+    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+    .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/^- (.+)$/gm, '<li>$1</li>')
+    .replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>')
+    .replace(/\n{2,}/g, '<br><br>')
+    .replace(/\n/g, '<br>');
+}
+
+// ─── AI STATUS CHECK ──────────────────────────
+async function checkAIStatus() {
+  try {
+    const r = await fetch('/api/status');
+    const d = await r.json();
+    const badge = document.getElementById('ai-badge-area');
+    if (d.aiEnabled) {
+      const label = d.isStatic ? '✨ IA ativa (Groq)' : '✨ IA ativa';
+      badge.innerHTML = `<span class="ai-badge">${label}</span>`;
+    } else if (d.isStatic) {
+      badge.innerHTML = '<span class="ai-badge" style="border-color:var(--gold);color:var(--gold);cursor:pointer" onclick="openGroqKeyConfig()" title="Clique para configurar sua chave Groq">⚙ Configurar IA</span>';
+    } else {
+      badge.innerHTML = '<span class="ai-badge" style="border-color:var(--muted);color:var(--muted)" title="Inicie o servidor com GROQ_API_KEY configurada">⚠ IA offline</span>';
+    }
+  } catch{}
+}
+
+// ─── INIT ─────────────────────────────────────
+(async () => {
+  await detectServerMode();
+  Tracker.load();
+  CharManager.loadFromServer();
+  SessionManager.load();
+  checkAIStatus();
+  document.getElementById('sess-date').value = new Date().toISOString().split('T')[0];
+})();
+
+// ─── NPC DETAIL MODAL ─────────────────────────
+function closeNPCDetail() { document.getElementById('npc-detail-modal').classList.remove('open'); }
+
+// ─── FERRAMENTAS: DADOS ───────────────────────
+let diceHistory = [];
+
+function rollDice(sides, count=1) {
+  const rolls = Array.from({length:count}, () => Math.ceil(Math.random()*sides));
+  return { rolls, total: rolls.reduce((a,b)=>a+b,0) };
+}
+
+function quickRoll(sides, count=1, bonus=0, label=null) {
+  const { rolls, total } = rollDice(sides, count);
+  const t = total + bonus;
+  const notation = (count>1?count:'')+'d'+sides+(bonus?'+'+bonus:'');
+  showDiceResult(t, rolls, notation, label);
+}
+
+function rollDisadvantage() {
+  const r1 = Math.ceil(Math.random()*20), r2 = Math.ceil(Math.random()*20);
+  const t = Math.min(r1,r2);
+  showDiceResult(t, [r1,r2], '2d20 Des.', 'Desvantagem (menor)');
+}
+
+function rollNotation() {
+  const raw = document.getElementById('dice-notation').value.trim().toLowerCase();
+  if (!raw) return;
+  const m = raw.match(/^(\d+)?d(\d+)([+-]\d+)?$/);
+  if (!m) { document.getElementById('dice-result').innerHTML = '<div style="color:var(--red2)">Notação inválida. Use: 2d6+3</div>'; return; }
+  const count = parseInt(m[1]||'1'), sides = parseInt(m[2]), bonus = parseInt(m[3]||'0');
+  const { rolls, total } = rollDice(sides, count);
+  showDiceResult(total+bonus, rolls, raw.toUpperCase(), null, bonus);
+}
+
+function showDiceResult(total, rolls, notation, label=null, bonus=0) {
+  const isCrit = notation.includes('d20') && rolls.includes(20);
+  const isFumble = notation.includes('d20') && rolls.includes(1) && rolls.length===1;
+  const color = isCrit ? 'var(--green2)' : isFumble ? 'var(--red2)' : 'var(--gold2)';
+  const tag = isCrit ? ' <span style="color:var(--green2);font-size:.8rem">CRÍTICO!</span>' : isFumble ? ' <span style="color:var(--red2);font-size:.8rem">FUMBLE!</span>' : '';
+  document.getElementById('dice-result').innerHTML = `
+    <div class="dice-total" style="color:${color}">${total}${tag}</div>
+    <div class="dice-detail">${label||notation} · [${rolls.join(', ')}]${bonus?' + '+bonus:''}</div>`;
+  diceHistory.unshift({ notation: label||notation, total, rolls });
+  if (diceHistory.length > 10) diceHistory.pop();
+  document.getElementById('dice-history').innerHTML = diceHistory.map(h=>
+    `<div class="dice-hist-item"><span>${h.notation} [${h.rolls.join(',')}]</span><span class="dice-hist-val">${h.total}</span></div>`
+  ).join('');
+}
+
+// ─── FERRAMENTAS: NOMES ───────────────────────
+const NAME_TABLES = {
+  humano: {
+    m: ['Aldric','Bram','Caelan','Dorian','Eryn','Faolan','Galen','Hadrian','Idris','Jorin','Kaelen','Loric','Marek','Neven','Orin','Paelan','Quillan','Rogan','Soren','Tavin','Ulen','Vael','Wystan','Xander','Yoren','Zael'],
+    f: ['Aela','Brenna','Calla','Dara','Elia','Fenna','Greta','Hilda','Isara','Jana','Kara','Lyra','Mira','Nara','Orla','Petra','Rhea','Sela','Tara','Ula','Vera','Wren','Xara','Yara','Zara','Sable'],
+    sobr: ['da Pedra','das Sombras','do Rio','do Norte','Ferrobrao','Lâminanegra','Caçador','das Colinas','Tempestade','Cinzas','do Pântano','Ferreiro','Thornwood','Ashford']
+  },
+  elfo: {
+    m: ['Aelindra','Caladrel','Eldrin','Fenmaer','Galdian','Halavar','Ilmeth','Jorlan','Kerath','Laerdya','Maeral','Naivara','Orisil','Perendithas','Qualyen','Rolen','Sylvris','Thamior','Uriaelis','Varis','Wyleth','Xylas','Yistin','Zeriel','Arannis','Berrian'],
+    f: ['Adrie','Birel','Caelynn','Dara','Enna','Faral','Gennara','Holimion','Iefyr','Joralia','Keyleth','Leshanna','Mialee','Naivara','Oraibi','Prismacara','Quelenna','Rhedyn','Silaqui','Talaedra','Umara','Valanthe','Wrenaria','Xanaphia','Yaereene','Zindara'],
+    sobr: ['Aloro','Brightwing','Brightsong','Amakiir','Galanodel','Holimion','Ilphelkiir','Liadon','Meliamne','Nai\'lo','Siannodel','Xiloscient']
+  },
+  anao: {
+    m: ['Adrik','Alberich','Baern','Brottor','Bruenor','Dain','Darrak','Delg','Eberk','Einkil','Fargrim','Flint','Gardain','Harbek','Kildrak','Morgran','Orsik','Oskar','Rangrim','Rurik','Taklinn','Thoradin','Thorin','Tordek','Traubon','Travok','Ulfgar','Veit','Vondal'],
+    f: ['Amber','Artin','Audhild','Bardryn','Dagnal','Diesa','Eldeth','Falkrunn','Finellen','Gunnloda','Gurdis','Helja','Hlin','Kathra','Kristryd','Ilde','Liftrasa','Mardred','Riswynn','Sannl','Torbera','Torgga','Vistra'],
+    sobr: ['Batalhabrava','Pedraferro','Picaretadourada','Mãodeaço','Punhoanvil','Barbatrouxa','Pedrafumo']
+  },
+  halfling: {
+    m: ['Alton','Ander','Cade','Corrin','Eldon','Errich','Finnan','Garret','Lindal','Lyle','Merric','Milo','Osborn','Perrin','Reed','Roscoe','Well','Bobwise','Frodão','Bilão'],
+    f: ['Andry','Bree','Callie','Cora','Euphemia','Jillian','Kithri','Lavinia','Lidda','Merla','Nedda','Paela','Portia','Seraphina','Shaena','Trym','Vani','Verna','Winta','Rosa'],
+    sobr: ['Pésveloz','Pézinhos','Ágil','Cabelo-Encaracolado','Buckland','Goodbarrel','Greenhill','High-hill','Hilltopple','Leagallow','Tealeaf','Thorngage','Tosscobble']
+  },
+  orc: {
+    m: ['Grom','Krag','Thrak','Vorg','Drak','Brug','Ug','Kul','Mag','Zog','Grak','Nar','Morg','Skrag','Worg'],
+    f: ['Grana','Kraga','Thrika','Vorga','Draka','Bruga','Uga','Kula','Maga','Zoga','Graka','Nara','Morga'],
+    sobr: ['Sangue-Seco','Casca-Dura','Dente-de-Ferro','Osso-Partido','Punho-Pesado','Pele-Cicatriz']
+  },
+  tiefling: {
+    m: ['Akmenos','Amnon','Barakas','Damakos','Ekemon','Iados','Kairon','Leucis','Melech','Mordai','Morthos','Pelaios','Skamos','Therai','Zed'],
+    f: ['Akta','Anakis','Bryseis','Criella','Damaia','Ea','Kallista','Lerissa','Makaria','Nemeia','Orianna','Phelaia','Rieta','Surina','Zelaia'],
+    sobr: ['Chamas','Sombra','Abismo','Cinzas','Noite','Enxofre']
+  },
+  draconato: {
+    m: ['Arjhan','Balasar','Bharash','Donaar','Ghesh','Heskan','Kriv','Medrash','Mehen','Nadarr','Pandjed','Patrin','Rhogar','Shamash','Shedinn','Tarhun','Torinn'],
+    f: ['Akra','Biri','Dari','Farideh','Harann','Havilar','Jheri','Kava','Korinn','Mishann','Nala','Perra','Raiann','Sora','Surina','Thava','Uadjit'],
+    sobr: ['Crestadorada','Escamasverdes','Olhodofogo','Garraforte','Dente de Prata']
+  },
+  gnomo: {
+    m: ['Alston','Alvyn','Boddynock','Brocc','Burgell','Dimble','Eldon','Erky','Fonkin','Frug','Gerbo','Gimble','Glim','Jebeddo','Kellen','Namfoodle','Orryn','Roondar','Seebo','Sindri','Warryn','Wrenn','Zook'],
+    f: ['Bimpnottin','Breena','Caramip','Carlin','Donella','Duvamil','Ella','Ellyjobell','Ellywick','Lilli','Loopmottin','Lorilla','Mardnab','Nissa','Nyx','Oda','Orla','Roywyn','Shamil','Tana','Waywocket','Zanna'],
+    sobr: ['Beren','Chismar','Daergel','Folkor','Garrick','Nackle','Murnig','Ningel','Raulnor','Scheppen','Turen','Waggletop']
+  }
+};
+let currentRace = 'humano';
+let nameGender = null;
+
+function selectRace(btn, race) {
+  document.querySelectorAll('.race-btn').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+  currentRace = race;
+  generateName();
+}
+
+function generateName(gender=null) {
+  if (gender) nameGender = gender;
+  const table = NAME_TABLES[currentRace];
+  const g = nameGender || (Math.random()<.5?'m':'f');
+  const first = table[g][Math.floor(Math.random()*table[g].length)];
+  const sobr = table.sobr[Math.floor(Math.random()*table.sobr.length)];
+  const full = `${first} ${sobr}`;
+  document.getElementById('name-result').textContent = full;
+  document.getElementById('name-sub').textContent = `${currentRace.charAt(0).toUpperCase()+currentRace.slice(1)} · ${g==='m'?'Masculino':'Feminino'}`;
+  const hist = document.getElementById('name-history');
+  const item = document.createElement('div');
+  item.style.cssText = 'font-size:.75rem;color:var(--text2);padding:.1rem 0;border-bottom:1px solid rgba(58,46,30,.3)';
+  item.textContent = full;
+  hist.prepend(item);
+  if (hist.children.length > 8) hist.removeChild(hist.lastChild);
+}
+
+// ─── FERRAMENTAS: CLIMA ───────────────────────
+const WEATHER = {
+  planicie: { temp:{primavera:[10,18],verao:[22,35],outono:[8,18],inverno:[-5,5]}, chuva:['Ensolarado','Nublado','Garoa','Chuva Leve','Chuva Forte','Tempestade'], vento:['Calmo','Brisa','Vento Moderado','Vento Forte','Rajadas'] },
+  floresta:  { temp:{primavera:[8,16],verao:[18,28],outono:[5,15],inverno:[-5,5]}, chuva:['Ensolarado (Filtrado)','Nublado','Garoa na Névoa','Chuva Leve','Chuva Forte','Tempestade com Raios'], vento:['Calmo','Brisa Suave','Sussurro nas Folhas','Vento Moderado','Rajadas'] },
+  montanha:  { temp:{primavera:[0,10],verao:[10,20],outono:[-2,10],inverno:[-15,-2]}, chuva:['Limpo e Claro','Nublado','Névoa Densa','Neve Leve','Nevasca','Tempestade de Gelo'], vento:['Calmo','Brisa Fria','Vento Uivante','Vento Forte de Altitude','Rajadas Perigosas'] },
+  deserto:   { temp:{primavera:[20,35],verao:[35,50],outono:[20,35],inverno:[5,20]}, chuva:['Céu Limpo','Nublado','Vento de Areia','Tempestade de Areia','Miragem','Calor Abrasador'], vento:['Calmo','Brisa Quente','Vento de Areia','Sirocco','Tempestade de Areia'] },
+  costa:     { temp:{primavera:[12,20],verao:[22,32],outono:[10,20],inverno:[2,10]}, chuva:['Ensolarado','Nublado','Névoa Marítima','Garoa Salgada','Chuva','Tempestade Costeira'], vento:['Brisa Marítima','Vento Moderado','Vento Forte','Rajadas Costeiras','Vendaval'] },
+  pantano:   { temp:{primavera:[10,20],verao:[25,35],outono:[10,18],inverno:[0,10]}, chuva:['Névoa Espessa','Nublado e Úmido','Garoa','Chuva Constante','Aguaceiro','Tempestade Elétrica'], vento:['Calmo e Abafado','Brisa Úmida','Vento Morno','Vento Moderado','Rajadas'] },
+  artico:    { temp:{primavera:[-10,0],verao:[0,5],outono:[-15,-5],inverno:[-30,-10]}, chuva:['Claro e Gelado','Nublado','Neve Leve','Neve Moderada','Nevasca','Blizzard'], vento:['Calmo','Brisa Polar','Vento Cortante','Vento Ártico','Ventania de Neve'] }
+};
+
+function generateWeather() {
+  const terrain = document.getElementById('weather-terrain').value;
+  const season = document.getElementById('weather-season').value;
+  const w = WEATHER[terrain];
+  const [tMin,tMax] = w.temp[season];
+  const temp = Math.round(tMin + Math.random()*(tMax-tMin));
+  const precip = w.chuva[Math.floor(Math.random()*w.chuva.length)];
+  const vento = w.vento[Math.floor(Math.random()*w.vento.length)];
+  const visib = ['Excelente','Boa','Moderada','Reduzida','Muito Baixa'][Math.floor(Math.random()*5)];
+  const especiais = ['Nenhum evento especial','Arco-íris ao anoitecer','Cheiro de chuva iminente','Pássaros migrando','Silêncio incomum na natureza','Trovões distantes','Estrelas brilhantes à noite','Lua grande e alaranjada','Vento carregando sementes/pétalas','Formação de nuvens incomum'];
+  const especial = especiais[Math.floor(Math.random()*especiais.length)];
+  document.getElementById('weather-result').innerHTML = `
+    <div class="weather-row"><span class="weather-label">Temperatura</span><span class="weather-val">${temp}°C</span></div>
+    <div class="weather-row"><span class="weather-label">Precipitação</span><span class="weather-val">${precip}</span></div>
+    <div class="weather-row"><span class="weather-label">Vento</span><span class="weather-val">${vento}</span></div>
+    <div class="weather-row"><span class="weather-label">Visibilidade</span><span class="weather-val">${visib}</span></div>
+    <div class="weather-row"><span class="weather-label">Detalhe</span><span class="weather-val" style="font-style:italic;color:var(--text2)">${especial}</span></div>`;
+}
+
+// ─── FERRAMENTAS: TESOURO ─────────────────────
+let currentCRTier = '0-4';
+
+function selectCR(btn, tier) {
+  document.querySelectorAll('.cr-btn').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+  currentCRTier = tier;
+}
+
+function d(sides) { return Math.ceil(Math.random()*sides); }
+function rollCoins(expr) {
+  if (!expr) return 0;
+  const m = String(expr).match(/(\d+)d(\d+)(?:\*(\d+))?/);
+  if (!m) return 0;
+  let t = 0; for(let i=0;i<parseInt(m[1]);i++) t+=d(parseInt(m[2]));
+  return m[3] ? t*parseInt(m[3]) : t;
+}
+
+function generateTreasure() {
+  const TIERS = {
+    '0-4':  { pc:[0,0,'6d6'],  pp:[0,0,'3d6'], po:[1,'2d6',0], pe:[0,0,0], gems:['Nenhum','Nenhum','Nenhum','Cristal (10 PO)','Jaspe (50 PO)','Ágata (10 PO)'], items:['Poção de Cura','Pergaminho com 1 Magia de Nível 1','Poção de Cura','Óleo de Escorregamento','Perfume Raro (25 PO)','Nenhum item mágico'] },
+    '5-10': { pc:[0,0,'2d6*100'], pp:[0,'2d4*10',0], po:[1,'6d6*10','2d6*100'], pe:[1,'3d6*10',0], gems:['Turquesa (10 PO)','Jade (100 PO)','Coral (100 PO)','Pérola (100 PO)','Opala de Fogo (1000 PO)','Diamante (5000 PO)'], items:['Poção de Cura Maior','Pergaminho de Magia Nível 2','Elixir de Saúde','Poção de Invisibilidade','Bota de Elfo','Capa de Proteção +1'] },
+    '11-16':{ pc:[0,0,0], pp:[0,0,'3d6*1000'], po:[1,'4d6*100','2d6*1000'], pe:[1,'3d6*100','3d6*100'], gems:['Safira (1000 PO)','Rubi (5000 PO)','Esmeralda (1000 PO)','Diamante Negro (5000 PO)','Corindo (1000 PO)','Jacinto (1000 PO)'], items:['Elmo da Telepatia','Espada +2','Anel de Proteção','Amuleto de Saúde','Luvas de Força de Ogro','Pergaminho de Magia Nível 5'] },
+    '17+':  { pc:[0,0,0], pp:[0,0,'2d6*1000'], po:[1,'12d6*1000','8d6*1000'], pe:[1,'8d6*1000','3d6*1000'], gems:['Rubi (5000 PO)','Diamante (5000 PO)','Rubí Inquebrável (50000 PO)','Opala Negra (5000 PO)','Pérola Real (5000 PO)','Safira Estelar (1000 PO)'], items:['Espada Vorpal','Escudo Animado','Anel de Três Desejos','Armadura de Invulnerabilidade','Cajado do Mago','Esfera de Aniquilação'] }
+  };
+  const t = TIERS[currentCRTier];
+  const coins = [];
+  const pc = rollCoins(t.pc[2]);
+  const pp = t.pp[1] ? rollCoins(t.pp[1]) : (t.pp[2]?rollCoins(t.pp[2]):0);
+  const po = rollCoins(t.po[1]||t.po[2]||'2d6');
+  const pe = t.pe[1] ? rollCoins(t.pe[1]) : (t.pe[2]?rollCoins(t.pe[2]):0);
+  if (pc) coins.push(`<span class="coin pc">${pc} PC</span>`);
+  if (pp) coins.push(`<span class="coin pp">${pp} PP</span>`);
+  if (po) coins.push(`<span class="coin po">${po} PO</span>`);
+  if (pe) coins.push(`<span class="coin pe">${pe} PE</span>`);
+  const gem = t.gems[Math.floor(Math.random()*t.gems.length)];
+  const item = t.items[Math.floor(Math.random()*t.items.length)];
+  document.getElementById('treasure-result').innerHTML = `
+    <div class="treasure-coins">${coins.join('')}</div>
+    <div class="treasure-items">💎 ${gem}<br>✨ ${item}</div>`;
+}
+
+// ─── FERRAMENTAS: ENCONTROS ───────────────────
+const ENCOUNTERS = {
+  floresta: {
+    '1-4':  ['3 Lobos espreitam entre as árvores','1 Urso Preto defende seu território','2d4 Goblins em emboscada nos galhos','1 Druida errante pede ajuda contra caçadores','Rastros de Ankhegh — chão instável','Ninho de Abelhas Assassinas perturbado pela party'],
+    '5-10': ['1 Tigre Dente-de-Sabre caça a party','Bando de 2d6 Gnolls ritualizando em clareira','Uma Dríade encantada busca heróis para missão','Um Homem-Leopardo ferido carrega um segredo','Cilada de Bandidos da Floresta (1 líder + 2d4 lacaios)','1 Unicórnio ferido por flecha envenenada'],
+    '11-16':['1 Dragão Verde Jovem exige pedágio','Um Wyvern nidifica próximo à trilha','Bruxas Noturnas em ritual lunar','1 Treant Ancião acordado e irado com desflorestamento','Portal Feérico instável libera criaturas aleatórias','Campeão de Lythari guarda a Floresta Sagrada'],
+    '17+':  ['1 Dragão Verde Ancião domina a floresta','Portal para o Feérico permanentemente aberto','Um Deus Florestal menor foi corrompido','Exército de elfos das sombras em marcha','Ritual para despertar uma Floresta Viva inteira','Um Lich se esconde em uma torre coberta pela floresta']
+  },
+  estrada: {
+    '1-4':  ['2d4 Bandidos bloqueiam a estrada','1 Mercador com carro partido pede ajuda','Grupo de Peregrinos assustados relata monstro à frente','1 Cavaleiro sem cavalo perseguindo algo','Carroça abandonada com marcas de sangue','1 Louco pregando sobre o fim dos tempos'],
+    '5-10': ['Uma caravana mercante está sendo saqueada','Posto de Cobrança ilegal de impostos (milícia corrupta)','1 Assassino contratado segue a party','Três Cavaleiros do Rei com mandado de prisão falso','Emboscada de Homens-Lagarto na ponte','Um lich menor em forma humana viaja incógnito'],
+    '11-16':['Patrulha de Cavaleiros Infernais','Um Gênio Efreet cobra passagem','Um Dragão Vermelho Jovem sobrevoando — procura alguém','Mensageiro Real com notícias de guerra que mudam tudo','Carruagem Negra sem cavalos avança sozinha','Anjo Caído pede proteção dos Celestiais'],
+    '17+':  ['Dragão Vermelho Ancião em forma de mercador','Portal para o Inferno abriu no meio da estrada','Exército de mortos-vivos marcha em direção à capital','Um Avatar de Deus da Morte verifica os limites mortais','O Diabo em pessoa negocia almas na encruzilhada','Seis Cavaleiros do Apocalipse se reúnem']
+  },
+  dungeon: {
+    '1-4':  ['1d6 Kobolds em patrulha','Armadilha de dardos envenenados (CD 12 DES)','Câmara com Mimico disfarçado de baú','2d4 Esqueletos guardando a sala','Um prisioneiro pede resgate — pode ser espião','Sala inundada com Gelatina Ocre'],
+    '5-10': ['1 Troll regenerador e faminto','Câmara com 3 Ogros e seu tesouro','Cultistas adorando um ídolo de gárgula','Um Mago Morto-Vivo guarda biblioteca proibida','Armadilha de esmagamento (CD 15 DES para desviar)','1 Beholder adormecido — barulho o acorda'],
+    '11-16':['1 Lich em seu estudo — não quer ser incomodado','Mind Flayer Colony com escravos','Câmara de Tesseract com Diabos aprisionados','1 Dragão Negro Jovem usa a dungeon como covil','Câmara com Golem de Ferro guardando artefato','Espírito Vingativo de Herói morto pede vingança'],
+    '17+':  ['1 Lich Poderoso e seu Filactério','Senhor dos Demônios aprisionado há séculos','Câmara de um Deus morto com seus resquícios de poder','Portal direto para os Nove Infernos','Um Tarrasque adormecido sob a dungeon inteira','O núcleo de energia que alimenta um plano inteiro']
+  },
+  cidade: {
+    '1-4':  ['Batedores de bolso tentam furtar a party','Uma briga de taverna sai de controle','Guarda corrupta exige propina','Um órfão seguindo a party pedindo comida','Falso mendigo é espião de guilda ladrões','Rumor de que a party tem recompensa nas cabeças'],
+    '5-10': ['Guilda de Assassinos contratada para eliminar a party','Incêndio proposital no bairro popular','Caçador de Recompensas com informações erradas','Corrupção na câmara municipal — prefeito sequestrado','Monstro surge dos esgotos','Leilão de item mágico com compradores suspeitos'],
+    '11-16':['Rede de Culto ativo — metade dos NPCs é membro','Invasão de Demônios — o Templo foi corrompido','Um Vampiro nobre local e sua coorte','Golpe palaciano em andamento — escolham um lado','Portão Planar aberto na praça central','Espião de outro plano rouba o MacGuffin'],
+    '17+':  ['Avatar de Deus Maligno encarnado como nobre','Exército de mortos-vivos sitiando a cidade','Dragão Cromático Ancião negocia com o rei','A Guilda dos Magos corrompida tenta abrir o véu','Uma Profecia se cumpre e a cidade está no epicentro','Todos os cidadãos foram substituídos por Cambiantes']
+  },
+  montanha: {
+    '1-4':  ['2d4 Kobolds montados em póneis','Avalanche iminente — CD 15 ATL para escapar','1 Gigante das Colinas faminto','Ermitão guarda segredo antigo','Trilha que desaparece na névoa — desorientação','Ninho de Arpias na passagem'],
+    '5-10': ['1 Gigante das Pedras em mau humor','Tempestade repentina — necessidade de abrigo','Dracos na passagem','Clã de Anões exilados recrutando','Grifos sobrevoando — proteção do ninho','1 Manticora caça a party do ar'],
+    '11-16':['Rei dos Gigantes viaja com séquito','1 Dragão Branco Jovem em sua caverna','Templo Antigo de Deus das Montanhas despertou','Colosso de Pedra animado por feiticeiro','Batalha entre Gigantes e Anões — escolham um lado','Um Vampiro Antigo se refugiou na montanha'],
+    '17+':  ['1 Dragão Branco Ancião — senhor da montanha','Gigante do Tempestade convoca a party para missão','Portal para o Plano da Terra permanentemente aberto','Um Deus da Montanha em forma mortal faz teste','Forja dos Deuses — arma capaz de matar deuses','Runa Antiga que mantém o mundo estável — ameaçada']
+  },
+  mar: {
+    '1-4':  ['3 Sahuagin atacam o barco','Navio Fantasma no horizonte','Sereia canta — tripulação entorpecida','Polvo Gigante agarra o leme','Tempestade repentina (CD 12 CON ou Exaustão 1)','Ilha não mapeada com sinais de ocupação'],
+    '5-10': ['Navio Pirata com bandeira de caveira élfica','Baleia Assassina IA atacando','Cultistas de Umberlee em ritual na proa','Kraken Jovem testando o barco','Cidade submarina habitada por Tritões','Tempestade de Relâmpagos — dano 2d10 por rodada'],
+    '11-16':['1 Dragão Azul Jovem sobrevolando o mar','Fantasma do Capitão afundado busca missão','Navio negreiro de Diabos — carregando almas','Redemoinho planar sugando o barco','Força Naval de Sahuagin com 1 Barão','Leviatã acorda perturbado pelo barco'],
+    '17+':  ['1 Dragão Azul Ancião — Senhor das Tempestades','Kraken Antigo irado com presença dos mortais','Um Deus do Mar em forma de tempestade','Navio dos Mortos — capitão é um Deus da Morte','Portal para o Plano da Água aberto no fundo do mar','A Maldição do Holandês Voador transferida para a party']
+  },
+  subterraneo: {
+    '1-4':  ['2d6 Kobolds mineradores','Câmara com gás venenoso (CD 12 CON)','1 Cão-Infernal escapado de portão','Escuridão mágica permanente numa área','Fungo Violeta adormecido — acorda com barulho','Trilho de mineração com carrinho desgovernado'],
+    '5-10': ['Colônia de Kuo-Toa adorando Blibdoolpoolp','1 Mind Flayer solitário caçando','Rocha Viva — o túnel respira','Câmara com 2d4 Anões Duegar','Poço sem fundo — voz sobe do abismo','1 Aboleth em lago subterrâneo'],
+    '11-16':['Cidade de Drow com Matriarca','Colônia de Mind Flayers e escravos','Portal para o Underdark Profundo','Um Primordial da Terra aprisionado','Cidade de Sverfneblin sob ataque','1 Dragão Negro Jovem no subterrâneo'],
+    '17+':  ['Lolth em avatar menor na cidade drow','Aboleth Anciano — memória de antes dos Deuses','Portal direto para o Underdark de um Plano de Sombras','Um Deus do Subterrâneo em forma de pedra viva','Cidade subterrânea inteira aprisionada por Feitiço Antigo','O coração rochoso do mundo — pulsando e sentiente']
+  }
+};
+
+function generateEncounter() {
+  const terrain = document.getElementById('enc-terrain').value;
+  const level = document.getElementById('enc-level').value;
+  const list = ENCOUNTERS[terrain]?.[level] || ENCOUNTERS.estrada['1-4'];
+  const enc = list[Math.floor(Math.random()*list.length)];
+  document.getElementById('enc-result').innerHTML = `<strong style="color:var(--gold2)">Encontro:</strong> ${enc}`;
+}
+
+// ─── FERRAMENTAS: NARRAÇÃO ────────────────────
+async function generateNarration() {
+  const scene = document.getElementById('narr-scene').value.trim();
+  if (!scene) {
+    document.getElementById('narr-status').textContent = 'Descreva a cena primeiro.';
+    document.getElementById('narr-status').className = 'ai-status error';
+    return;
+  }
+  const btn = document.getElementById('narr-btn');
+  const status = document.getElementById('narr-status');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Narrando...';
+  status.textContent = 'IA criando narração...'; status.className = 'ai-status';
+  try {
+    const r = await fetch('/api/generate-narration', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        scene,
+        type: document.getElementById('narr-type').value,
+        tone: document.getElementById('narr-tone').value,
+        length: document.getElementById('narr-length').value,
+        characters: CharManager.getAll('jogador').map(c => c.nome||c.name).filter(Boolean)
+      })
+    });
+    const d = await r.json();
+    if (!d.ok) throw new Error(d.error);
+    document.getElementById('narr-output').textContent = d.narration;
+    status.textContent = '✓ Narração gerada!'; status.className = 'ai-status ok';
+  } catch(e) {
+    status.textContent = 'Erro: '+e.message; status.className = 'ai-status error';
+  } finally {
+    btn.disabled = false; btn.innerHTML = '✨ Narrar';
+  }
+}
+
+function quickNarr(text) {
+  document.getElementById('narr-scene').value = text;
+  generateNarration();
+}
+
+function copyNarration() {
+  const text = document.getElementById('narr-output').textContent;
+  if (text === 'A narração aparecerá aqui...') return;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = event.target;
+    btn.textContent = '✓ Copiado!';
+    setTimeout(() => btn.textContent = '📋 Copiar', 2000);
+  });
+}
+
+// ─── FERRAMENTAS: CRONÔMETRO ──────────────────
+let timerStart = null, timerElapsed = 0, timerRunning = false, timerInterval = null, lapCount = 0;
+
+function timerToggle() {
+  if (timerRunning) {
+    clearInterval(timerInterval);
+    timerElapsed += Date.now() - timerStart;
+    timerRunning = false;
+    document.getElementById('timer-start-btn').textContent = '▶ Retomar';
+    document.getElementById('timer-status').textContent = 'Pausado';
+  } else {
+    timerStart = Date.now();
+    timerRunning = true;
+    document.getElementById('timer-start-btn').textContent = '⏸ Pausar';
+    document.getElementById('timer-status').textContent = 'Rodando...';
+    timerInterval = setInterval(timerTick, 500);
+  }
+}
+
+function timerTick() {
+  const total = timerElapsed + (Date.now() - timerStart);
+  const h = Math.floor(total/3600000).toString().padStart(2,'0');
+  const m = Math.floor((total%3600000)/60000).toString().padStart(2,'0');
+  const s = Math.floor((total%60000)/1000).toString().padStart(2,'0');
+  document.getElementById('timer-display').textContent = `${h}:${m}:${s}`;
+}
+
+function timerReset() {
+  clearInterval(timerInterval);
+  timerRunning = false; timerElapsed = 0; timerStart = null; lapCount = 0;
+  document.getElementById('timer-display').textContent = '00:00:00';
+  document.getElementById('timer-status').textContent = 'Parado';
+  document.getElementById('timer-start-btn').textContent = '▶ Iniciar';
+  document.getElementById('timer-laps').innerHTML = '';
+}
+
+function timerLap() {
+  const total = timerElapsed + (timerRunning ? Date.now()-timerStart : 0);
+  const h = Math.floor(total/3600000).toString().padStart(2,'0');
+  const m = Math.floor((total%3600000)/60000).toString().padStart(2,'0');
+  const s = Math.floor((total%60000)/1000).toString().padStart(2,'0');
+  lapCount++;
+  const div = document.createElement('div');
+  div.style.cssText = 'font-size:.75rem;color:var(--text2);padding:.1rem 0;border-bottom:1px solid rgba(58,46,30,.3);display:flex;justify-content:space-between';
+  div.innerHTML = `<span>Marca ${lapCount}</span><span style="color:var(--gold2)">${h}:${m}:${s}</span>`;
+  document.getElementById('timer-laps').prepend(div);
+}
+</script>
+
+
+</body>
+</html>
